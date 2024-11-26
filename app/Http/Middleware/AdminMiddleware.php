@@ -15,6 +15,8 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $userRole = auth("admin")->user()->role;
+        $userPermissions = $userRole->permissions->pluck('name');
         // echo "birbri";
         // if (!auth('admin')->check()) {
         //     return response()->json([

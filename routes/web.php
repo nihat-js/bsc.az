@@ -12,20 +12,9 @@ Route::get('/', function () {
 });
 
 Route::get("/test", function () {
-    // Auth::loginUsingId(1,true);
-    // Auth::logi
-    // Auth::guard("admin")->loginUsingId(1,true);
-    // Auth::guard("admin")->
-    // return session()->all();
+    
 
-    // return Auth::guard("admin")->user();
-    // return Auth::user();
-    // $a = Admin::create([
-    //     "name" => "admin",
-    //     "email" => "admin@admin.com",
-    //     "password" => bcrypt("adminadmin")
-    // ]);
-    // return $a;
+    return Admin::find(1)->permissions;
 });
 
 

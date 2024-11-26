@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Hash;
 use Illuminate\Http\Request;
 
-class UserAuthController extends Controller
+class AuthController extends Controller
 {
     public function register(Request $request)
     {
@@ -21,7 +22,7 @@ class UserAuthController extends Controller
             'password' => Hash::make($registerUserData['password']),
         ]);
         return response()->json([
-            'message' => 'User Created ',
+            'message' => 'User Created',
         ]);
     }
     public function login(Request $request)

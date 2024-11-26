@@ -1,17 +1,14 @@
 <?php
 
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 
-class AdminAuthController extends Controller
+class AuthController extends Controller
 {
-    public function showLoginForm()
-    {
-        return view('admin.login');  // Display the admin login view
-    }
 
     public function login(Request $request)
     {
@@ -21,7 +18,7 @@ class AdminAuthController extends Controller
             return redirect()->intended(route('admin.dashboard'));
         }
 
-        return back()->withErrors(['email' => 'Invalid credentials']);
+        return back()->withErrors(['error' => 'Invalid credentials']);
     }
 
     public function logout()

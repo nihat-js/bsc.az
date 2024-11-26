@@ -1,26 +1,36 @@
 <?php
 
-use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\Admin\LanguageController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\UserAuthController;
+use App\Http\Controllers\User;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
+
+
+// Route::get("/test",function(){
+    // auth("admin")->loginUsingId(1);
+    // echo "adsa";
+    // $user = auth("admin")->user()-givePermissions("aa");
+    // return $user;
+// });
 
 
 
 
+// Route::post('register', [UserAuthController::class, 'register']);
+// Route::post('login', [UserAuthController::class, 'login']);
+// Route::post('logout', [UserAuthController::class, 'logout'])
+    // ->middleware('auth:sanctum');
 
-Route::post('register', [UserAuthController::class, 'register']);
-Route::post('login', [UserAuthController::class, 'login']);
-Route::post('logout', [UserAuthController::class, 'logout'])
-    ->middleware('auth:sanctum');
+
 
 Route::post("/balance", function () {
     return "User balance is";
@@ -64,11 +74,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/settings/{id}', [SettingController::class, 'update'])->name('settings.update');
     Route::delete('/settings/{id}', [SettingController::class, 'destroy'])->name('settings.delete');
 
-    Route::get('/categories', [Category::class, 'all'])->name('categories.all');
+    // Route::get('/categories', [Category::class, 'all'])->name('categories.all');
     Route::post('/categories', [SettingController::class, 'create'])->name('categories.create');
     Route::get('/categories/{id}', [SettingController::class, 'details'])->name('categories.details');
     Route::put('/categories/{id}', [SettingController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}', [SettingController::class, 'destroy'])->name('categories.delete');
+
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+    Route::get('/languages', [LanguageController::class, 'index'])->name('languages.index');
+    Route::get('/languages/{id}', [LanguageController::class, 'show'])->name('languages.show');
+    Route::post('/languages', [LanguageController::class, 'store'])->name('languages.store');
+    Route::put('/languages/{id}', [LanguageController::class, 'update'])->name('languages.update');
+    Route::delete('/languages/{id}', [LanguageController::class, 'destroy'])->name('languages.destroy');
 
 
 
