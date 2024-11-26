@@ -9,19 +9,11 @@ class Category extends Model
 {
     use HasFactory;
 
-    // The table associated with the model.
     protected $table = 'categories';
 
-    // Primary key field (optional, since Laravel assumes 'id' by default)
     protected $primaryKey = 'id';
 
-    // Auto-incrementing is true by default, so this line is not necessary unless explicitly required.
-    // public $incrementing = false;
 
-    // The data type of the primary key (int by default)
-    protected $keyType = 'int';
-
-    // The attributes that are mass assignable
     protected $fillable = [
         'parent_id',
         'is_visible',
@@ -30,7 +22,6 @@ class Category extends Model
         'redirect_url',
     ];
 
-    // The attributes that should be hidden for arrays (e.g., sensitive data)
     protected $hidden = [];
 
     // The attributes that should be cast to native types
