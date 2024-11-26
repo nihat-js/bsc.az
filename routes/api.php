@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserAuthController;
@@ -38,3 +39,15 @@ Route::group(["middleware" => "prefix"], function () {
     Route::delete('/partners/{partner}', [PartnerController::class, 'destroy'])->name('partners.destroy');
 
 })->middleware("auth:sanctum");
+
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [AdminAuthController::class, 'login']);
+    Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
+});
+
+
+Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function () {
+    // Route::get('dashboard', [::class, 'index'])->name('dashboard');
+});
