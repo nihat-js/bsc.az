@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\User\AuthController as UserAuthController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\User;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Http\Request;
@@ -16,29 +16,30 @@ use Illuminate\Support\Facades\Route;
 
 
 // Route::get("/test",function(){
-    // auth("admin")->loginUsingId(1);
-    // echo "adsa";
-    // $user = auth("admin")->user()-givePermissions("aa");
-    // return $user;
+// auth("admin")->loginUsingId(1);
+// echo "adsa";
+// $user = auth("admin")->user()-givePermissions("aa");
+// return $user;
 // });
 
 
-
-
-// Route::post('register', [UserAuthController::class, 'register']);
-// Route::post('login', [UserAuthController::class, 'login']);
-// Route::post('logout', [UserAuthController::class, 'logout'])
-    // ->middleware('auth:sanctum');
+Route::post('register', [UserAuthController::class, 'register']);
+Route::post('login', [UserAuthController::class, 'login']);
+Route::post('logout', [UserAuthController::class, 'logout']);
+Route::post('test', [UserAuthController::class, 'test'])->middleware('auth:users');
 
 
 
-Route::post("/balance", function () {
-    return "User balance is";
-});
+Route::post('admin/register', [AdminAuthController::class, 'register'])->name('admin.register');
+Route::post('admin/login', [AdminAuthController::class, 'login'])->name('admin.login');
+Route::post('admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.test')->middleware('auth:admins');
 
-Route::get("/products", [ProductController::class, "all"]);
 
-Route::group(["middleware" => "auth:sanctum"], function () {
+
+
+
+Route::group([], function () {
 
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
@@ -56,25 +57,17 @@ Route::group(["middleware" => "auth:sanctum"], function () {
 })->middleware("auth:sanctum");
 
 
-Route::prefix('admin')->name('admin.')->group(function () {
-
-    Route::get('register', [AdminAuthController::class, 'register'])->name('register');
-    Route::get('login', [AdminAuthController::class, 'login'])->name('login');
-    Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
-});
-
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
 
-    // settings
     Route::get('/settings', [SettingController::class, 'all'])->name('settings.all');
     Route::post('/settings', [SettingController::class, 'create'])->name('settings.create');
     Route::get('/settings/{id}', [SettingController::class, 'details'])->name('settings.details');
     Route::put('/settings/{id}', [SettingController::class, 'update'])->name('settings.update');
     Route::delete('/settings/{id}', [SettingController::class, 'destroy'])->name('settings.delete');
 
-    // Route::get('/categories', [Category::class, 'all'])->name('categories.all');
+
     Route::post('/categories', [SettingController::class, 'create'])->name('categories.create');
     Route::get('/categories/{id}', [SettingController::class, 'details'])->name('categories.details');
     Route::put('/categories/{id}', [SettingController::class, 'update'])->name('categories.update');
@@ -91,11 +84,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/languages', [LanguageController::class, 'store'])->name('languages.store');
     Route::put('/languages/{id}', [LanguageController::class, 'update'])->name('languages.update');
     Route::delete('/languages/{id}', [LanguageController::class, 'destroy'])->name('languages.destroy');
-
-
-
-
-    
 
     Route::get("test", function () {
         return "Admin test";

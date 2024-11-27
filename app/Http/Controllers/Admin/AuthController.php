@@ -3,27 +3,81 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers;
+use App\Http\Controllers\Controller;
+use App\Models\Admin;
+use Hash;
 use Illuminate\Http\Request;
 use Auth;
 
 class AuthController extends Controller
 {
 
+
+    public function register(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
+        ]);
+
+        $user = Admin::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+        ]);
+        return response()->json([
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
+    }
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::guard('admin')->attempt($credentials)) {
-            return redirect()->intended(route('admin.dashboard'));
+        $user = Admin::where('email', $request->email)->first();
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => ['Username or password incorrect'],
+            ]);
         }
+        // $user->tokens()->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User logged in successfully',
+            'name' => $user->name,
+            'token' => $user->createToken('Admin Token')->plainTextToken,
+        ]);
+    }
+    public function test()
+    {
 
-        return back()->withErrors(['error' => 'Invalid credentials']);
+        // if (Auth::guard('admin')->check()) {
+        //     return response()->json([
+        //         'message' => 'Finallyyy',
+        //     ]);
+        // }
+        // echo "Qese";
+        return response()->json([
+            'message' => 'You are in',
+        ]);
+        // if (Auth::guard('admin')->check()) {
+        //     return response()->json([
+        //         'message' => 'You are in',
+        //     ]);
+        // } else {
+        //     return response()->json([
+        //         'message' => 'You are not authorized',
+        //     ]);
+        // }
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::guard('admin')->logout();
-        return redirect()->route('admin.login');
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(
+            [
+                'status' => 'success',
+                'message' => 'User logged out successfully'
+            ]
+        );
     }
 }
