@@ -49,25 +49,10 @@ class AuthController extends Controller
     }
     public function test()
     {
-
-        // if (Auth::guard('admin')->check()) {
-        //     return response()->json([
-        //         'message' => 'Finallyyy',
-        //     ]);
-        // }
-        // echo "Qese";
         return response()->json([
             'message' => 'You are in',
         ]);
-        // if (Auth::guard('admin')->check()) {
-        //     return response()->json([
-        //         'message' => 'You are in',
-        //     ]);
-        // } else {
-        //     return response()->json([
-        //         'message' => 'You are not authorized',
-        //     ]);
-        // }
+
     }
 
     public function logout(Request $request)

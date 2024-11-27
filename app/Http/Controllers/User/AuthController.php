@@ -19,7 +19,7 @@ class AuthController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:6',
         ]);
 
         $user = User::create([
@@ -34,16 +34,13 @@ class AuthController extends Controller
     }
     public function login(Request $request)
     {
-        // Find the user by email
         $user = User::where('email', $request->email)->first();
 
-        // Check if the user exists and the password is correct
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'message' => ['Username or password incorrect'],
-            ], 401); // Unauthorized status code
+            ], 401); 
         }
-        // dd($user->tokens()->get());
 
         $token = $user->createToken('User Token')->plainTextToken;
 
@@ -51,7 +48,7 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'User logged in successfully',
             'name' => $user->name,
-            'token' => $token,  // Return the actual token
+            'token' => $token,
         ]);
     }
     public function test()

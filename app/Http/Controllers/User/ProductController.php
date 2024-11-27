@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -10,10 +11,7 @@ class ProductController extends Controller
     // Display a list of all products
     public function index()
     {
-        // Fetch all products from the database
         $products = Product::all();
-
-        // Return the products as a JSON response
         return response()->json($products);
     }
 

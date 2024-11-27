@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\User\ProductController as UserProductController;
+
 use App\Http\Controllers\User\AuthController as UserAuthController;
 use App\Http\Controllers\PartnerController;
-use App\Http\Controllers\ProductController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Http\Request;
@@ -39,13 +41,13 @@ Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.tes
 
 
 
-Route::group([], function () {
+Route::group(["prefix" => ""], function () {
 
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
-    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
-    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/products', [UserProductController::class, 'all'])->name('products.all');
+    Route::get('/products/{product}', [UserProductController::class, 'show'])->name('products.show');
+    Route::post('/products', [UserProductController::class, 'store'])->name('products.store');
+    Route::put('/products/{product}', [UserProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [UserProductController::class, 'destroy'])->name('products.destroy');
 
 
     Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
@@ -54,30 +56,30 @@ Route::group([], function () {
     Route::put('/partners/{partner}', [PartnerController::class, 'update'])->name('partners.update');
     Route::delete('/partners/{partner}', [PartnerController::class, 'destroy'])->name('partners.destroy');
 
-})->middleware("auth:sanctum");
+})->middleware("auth:users");
 
 
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
 
-    Route::get('/settings', [SettingController::class, 'all'])->name('settings.all');
-    Route::post('/settings', [SettingController::class, 'create'])->name('settings.create');
-    Route::get('/settings/{id}', [SettingController::class, 'details'])->name('settings.details');
-    Route::put('/settings/{id}', [SettingController::class, 'update'])->name('settings.update');
-    Route::delete('/settings/{id}', [SettingController::class, 'destroy'])->name('settings.delete');
+    // Route::get('/settings', [SettingController::class, 'all'])->name('settings.all');
+    // Route::post('/settings', [SettingController::class, 'create'])->name('settings.create');
+    // Route::get('/settings/{id}', [SettingController::class, 'details'])->name('settings.details');
+    // Route::put('/settings/{id}', [SettingController::class, 'update'])->name('settings.update');
+    // Route::delete('/settings/{id}', [SettingController::class, 'destroy'])->name('settings.delete');
 
 
-    Route::post('/categories', [SettingController::class, 'create'])->name('categories.create');
-    Route::get('/categories/{id}', [SettingController::class, 'details'])->name('categories.details');
-    Route::put('/categories/{id}', [SettingController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{id}', [SettingController::class, 'destroy'])->name('categories.delete');
+    // Route::post('/categories', [SettingController::class, 'create'])->name('categories.create');
+    // Route::get('/categories/{id}', [SettingController::class, 'details'])->name('categories.details');
+    // Route::put('/categories/{id}', [SettingController::class, 'update'])->name('categories.update');
+    // Route::delete('/categories/{id}', [SettingController::class, 'destroy'])->name('categories.delete');
 
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
-    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
-    Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/products', [AdminProductController::class, 'all'])->name('products.all');
+    Route::get('/products/{id}', [AdminProductController::class, 'details'])->name('products.details');
+    Route::post('/products', [AdminProductController::class, 'add'])->name('products.add');
+    Route::put('/products/{id}', [AdminProductController::class, 'edit'])->name('products.edit');
+    Route::delete('/products/{id}', [AdminProductController::class, 'delete'])->name('products.delete');
 
     Route::get('/languages', [LanguageController::class, 'index'])->name('languages.index');
     Route::get('/languages/{id}', [LanguageController::class, 'show'])->name('languages.show');
@@ -85,8 +87,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/languages/{id}', [LanguageController::class, 'update'])->name('languages.update');
     Route::delete('/languages/{id}', [LanguageController::class, 'destroy'])->name('languages.destroy');
 
-    Route::get("test", function () {
-        return "Admin test";
-    });
-    // Route::get('dashboard', [::class, 'index'])->name('dashboard');
+  
 });
