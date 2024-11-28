@@ -35,4 +35,9 @@ class News extends Model
 
     // Optional: Add the created_at and updated_at if not automatically handled
     public $timestamps = true;
+
+    public function translations()
+    {
+        return $this->hasMany(NewsTranslate::class, 'news_id', 'id');
+    }
 }

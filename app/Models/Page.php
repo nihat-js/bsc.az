@@ -12,13 +12,8 @@ class Page extends Model
     // The table associated with the model.
     protected $table = 'pages';
 
-    // Primary key field (optional, since Laravel assumes 'id' by default)
     protected $primaryKey = 'id';
-
-    // The data type of the primary key
     protected $keyType = 'int';
-
-    // The attributes that are mass assignable
     protected $fillable = [
         'type',
         'is_main',
@@ -26,13 +21,15 @@ class Page extends Model
         'image',
     ];
 
-    // The attributes that should be cast to native types
     protected $casts = [
         'type' => 'integer',
         'is_main' => 'boolean',
         'is_visible' => 'boolean',
     ];
-
-    // Optional: Add the created_at and updated_at if not automatically handled
     public $timestamps = true;
+
+    public function translations()
+    {
+        return $this->hasMany(PageTranslate::class);
+    }
 }

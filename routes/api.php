@@ -2,6 +2,8 @@
 
 
 
+use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\PageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -9,10 +11,10 @@ use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\PartnerController;
 
 use App\Http\Controllers\User\AuthController as UserAuthController;
-use App\Http\Controllers\User\PartnerController;
-use App\Http\Controllers\User\ProductController as UserProductController;
+// use App\Http\Controllers\User\ProductController as UserProductController;
 
 
 
@@ -44,26 +46,6 @@ Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.tes
 
 
 
-
-Route::group(["prefix" => ""], function () {
-
-    Route::get('/products', [UserProductController::class, 'all'])->name('products.all');
-    Route::get('/products/{product}', [UserProductController::class, 'show'])->name('products.show');
-    Route::post('/products', [UserProductController::class, 'store'])->name('products.store');
-    Route::put('/products/{product}', [UserProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{product}', [UserProductController::class, 'destroy'])->name('products.destroy');
-
-
-    Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
-    Route::get('/partners/{partner}', [PartnerController::class, 'show'])->name('partners.show');
-    Route::post('/partners', [PartnerController::class, 'store'])->name('partners.store');
-    Route::put('/partners/{partner}', [PartnerController::class, 'update'])->name('partners.update');
-    Route::delete('/partners/{partner}', [PartnerController::class, 'destroy'])->name('partners.destroy');
-
-})->middleware("auth:users");
-
-
-
 Route::prefix('admin')->name('admin.')->group(function () {
 
 
@@ -88,5 +70,46 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/products/{id}', [AdminProductController::class, 'edit'])->name('products.edit');
     Route::delete('/products/{id}', [AdminProductController::class, 'delete'])->name('products.delete');
 
+    
+    Route::get('/news', [NewsController::class, 'all'])->name('news.all');
+    Route::post('/news', [NewsController::class, 'add'])->name('news.add');
+    Route::get('/news/slug/{slug}', [NewsController::class, 'getBySlug'])->name('news.getBySlug');
+    Route::get('/news/{id}', [NewsController::class, 'details'])->name('news.details');
+    Route::put('/news/{id}', [NewsController::class, 'edit'])->name('news.edit');
+    Route::delete('/news/{id}', [NewsController::class, 'delete'])->name('news.delete');
+
+    
+    Route::get('/pages', [PageController::class, 'all'])->name('pages.all');
+    Route::get('/pages/{id}', [PageController::class, 'details'])->name('pages.details');
+    Route::post('/pages', [PageController::class, 'add'])->name('pages.add');
+    Route::put('/pages/{id}', [PageController::class, 'edit'])->name('pages.edit');
+    Route::delete('/pages/{id}', [PageController::class, 'delete'])->name('pages.delete');
+
+
+    
+    // Route::get('/partners', [PartnerController::class, 'all'])->name('partners.all');
+    // Route::get('/partners/{partner}', [PartnerController::class, 'show'])->name('partners.show');
+    // Route::post('/partners', [PartnerController::class, 'add'])->name('partners.add');
+    // Route::put('/partners/{partner}', [PartnerController::class, 'edit'])->name('partners.edit');
+    // Route::delete('/partners/{partner}', [PartnerController::class, 'delete'])->name('partners.delete');
+
+
   
-});
+})->middleware("auth:admins");
+
+
+
+
+
+// Route::group(["prefix" => ""], function () {
+
+//     Route::get('/products', [UserProductController::class, 'all'])->name('products.all');
+//     Route::get('/products/{product}', [UserProductController::class, 'show'])->name('products.show');
+//     Route::post('/products', [UserProductController::class, 'store'])->name('products.store');
+//     Route::put('/products/{product}', [UserProductController::class, 'update'])->name('products.update');
+//     Route::delete('/products/{product}', [UserProductController::class, 'destroy'])->name('products.destroy');
+
+
+// })->middleware("auth:users");
+
+
