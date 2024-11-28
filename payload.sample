@@ -1,0 +1,16 @@
+{
+  "is_visible": true,
+  "add_basket": false,
+  "discount_price": 0,
+  "price": 0,
+  "file": null,
+  "translations" : [
+    {
+      "lang_id" : 1,
+      "slug" : "fincan-ag",
+      "name" : "Ag fincan",
+      "description" : "Cooox bahalidi"
+    }
+  ]
+}
+

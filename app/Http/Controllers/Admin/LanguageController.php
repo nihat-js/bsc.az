@@ -10,19 +10,13 @@ use Illuminate\Http\Request;
 
 class LanguageController 
 {
-    /**
-     * Display a listing of the languages.
-     */
-    public function index()
+    public function all() 
     {
         $languages = Language::all();
         return response()->json($languages, 200);
     }
 
-    /**
-     * Store a newly created language in storage.
-     */
-    public function store(Request $request)
+    public function add(Request $request)
     {
         $validated = $request->validate([
             'is_visible' => 'required|boolean',
@@ -35,20 +29,15 @@ class LanguageController
         return response()->json($language, 201);
     }
 
-    public function show($id)
+    public function details($id)
     {
         $language = Language::find($id);
-
-        // if (!$language) {
-        //     return response()->json(['message' => 'Language not found'], 404);
-        // }
-
+        if (!$language) {
+            return response()->json(['message' => 'Language not found'], 404);
+        }
         return response()->json($language, 200);
     }
 
-    /**
-     * Update the specified language in storage.
-     */
     public function update(Request $request, $id)
     {
         $language = Language::find($id);
@@ -68,10 +57,7 @@ class LanguageController
         return response()->json($language, 200);
     }
 
-    /**
-     * Remove the specified language from storage.
-     */
-    public function destroy($id)
+    public function delete($id)
     {
         $language = Language::find($id);
 

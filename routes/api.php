@@ -1,16 +1,20 @@
 <?php
 
+
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
-use App\Http\Controllers\User\ProductController as UserProductController;
+use App\Http\Controllers\Admin\SettingController;
 
 use App\Http\Controllers\User\AuthController as UserAuthController;
-use App\Http\Controllers\PartnerController;
-use App\Http\Middleware\AdminMiddleware;
-use App\Http\Controllers\Admin\SettingController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\User\PartnerController;
+use App\Http\Controllers\User\ProductController as UserProductController;
+
+
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -69,23 +73,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/settings/{id}', [SettingController::class, 'update'])->name('settings.update');
     Route::delete('/settings/{id}', [SettingController::class, 'delete'])->name('settings.delete');
 
+    
+    Route::get('/languages', [LanguageController::class, 'all'])->name('languages.all');
+    Route::get('/languages/{id}', [LanguageController::class, 'details'])->name('languages.details');
+    Route::post('/languages', [LanguageController::class, 'add'])->name('languages.add');
+    Route::put('/languages/{id}', [LanguageController::class, 'update'])->name('languages.update');
+    Route::delete('/languages/{id}', [LanguageController::class, 'delete'])->name('languages.delete');
 
-    // Route::post('/categories', [SettingController::class, 'create'])->name('categories.create');
-    // Route::get('/categories/{id}', [SettingController::class, 'details'])->name('categories.details');
-    // Route::put('/categories/{id}', [SettingController::class, 'update'])->name('categories.update');
-    // Route::delete('/categories/{id}', [SettingController::class, 'destroy'])->name('categories.delete');
+
 
     Route::get('/products', [AdminProductController::class, 'all'])->name('products.all');
     Route::get('/products/{id}', [AdminProductController::class, 'details'])->name('products.details');
     Route::post('/products', [AdminProductController::class, 'add'])->name('products.add');
     Route::put('/products/{id}', [AdminProductController::class, 'edit'])->name('products.edit');
     Route::delete('/products/{id}', [AdminProductController::class, 'delete'])->name('products.delete');
-
-    Route::get('/languages', [LanguageController::class, 'index'])->name('languages.index');
-    Route::get('/languages/{id}', [LanguageController::class, 'show'])->name('languages.show');
-    Route::post('/languages', [LanguageController::class, 'store'])->name('languages.store');
-    Route::put('/languages/{id}', [LanguageController::class, 'update'])->name('languages.update');
-    Route::delete('/languages/{id}', [LanguageController::class, 'destroy'])->name('languages.destroy');
 
   
 });
