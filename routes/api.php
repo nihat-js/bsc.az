@@ -63,11 +63,11 @@ Route::group(["prefix" => ""], function () {
 Route::prefix('admin')->name('admin.')->group(function () {
 
 
-    // Route::get('/settings', [SettingController::class, 'all'])->name('settings.all');
-    // Route::post('/settings', [SettingController::class, 'create'])->name('settings.create');
-    // Route::get('/settings/{id}', [SettingController::class, 'details'])->name('settings.details');
-    // Route::put('/settings/{id}', [SettingController::class, 'update'])->name('settings.update');
-    // Route::delete('/settings/{id}', [SettingController::class, 'destroy'])->name('settings.delete');
+    Route::get('/settings', [SettingController::class, 'all'])->name('settings.all');
+    Route::post('/settings', [SettingController::class, 'add'])->name('settings.add');
+    Route::get('/settings/{key}', [SettingController::class, 'details'])->name('settings.details');
+    Route::put('/settings/{id}', [SettingController::class, 'update'])->name('settings.update');
+    Route::delete('/settings/{id}', [SettingController::class, 'delete'])->name('settings.delete');
 
 
     // Route::post('/categories', [SettingController::class, 'create'])->name('categories.create');

@@ -49,8 +49,10 @@ class AuthController extends Controller
     }
     public function test()
     {
+        $name = auth()->user()->password;
         return response()->json([
             'message' => 'You are in',
+            "name" => $name
         ]);
 
     }

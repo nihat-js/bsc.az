@@ -15,22 +15,29 @@ class SettingController extends Controller
         return response()->json($settings);
     }
 
-    public function create(Request $request)
+    public function add(Request $request)
     {
         $validatedData = $request->validate([
             'key' => 'required|string|unique:settings,key',
             'value' => 'required|string',
         ]);
 
-        // Create the new setting
         $setting = Setting::create($validatedData);
 
-        // Return response
         return response()->json($setting, Response::HTTP_CREATED);
     }
 
+    public function details($key)
+    {
+        $setting = Setting::where('key', $key)->first();
 
-    // Update the specified setting
+        if (!$setting) {
+            return response()->json(['message' => 'Setting not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json($setting);
+    }
+
     public function update(Request $request, $id)
     {
         $setting = Setting::find($id);
@@ -39,13 +46,11 @@ class SettingController extends Controller
             return response()->json(['message' => 'Setting not found'], Response::HTTP_NOT_FOUND);
         }
 
-        // Validate incoming data
         $validatedData = $request->validate([
             'key' => 'required|string|unique:settings,key,' . $id,
             'value' => 'required|string',
         ]);
 
-        // Update the setting
         $setting->update($validatedData);
 
         return response()->json($setting);
