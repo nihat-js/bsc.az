@@ -12,7 +12,7 @@ class ProductController extends Controller
     public function all()
     {
         $page = (int) request()->query("p") ?: 1;
-        $limit = (int) request()->query("l") ?: 10;
+        $limit = (int) request()->query("l") ?: 100;
 
         $products = Product::with("translations")->skip(($page - 1) * $limit)->take($limit)->get();
 
@@ -32,6 +32,8 @@ class ProductController extends Controller
             'translations.*.slug' => 'required|string|unique:product_translates,slug|max:255',
             'translations.*.name' => 'required|string|max:255',
             'translations.*.description' => 'nullable|string',
+            "images" => "nullable|array",
+            "images.*." => "string",
         ]);
 
         // Create the product
@@ -42,6 +44,17 @@ class ProductController extends Controller
             'price' => $validated['price'],
             'file' => $validated['file'],
         ]);
+
+        if ($validated["images"]){
+            foreach ($validated["images"] as $image){
+                // save image
+            }
+                $product->images()->create(["file" => $image]);
+            }
+            $is_main =
+            $is_visible
+            $image
+        }
 
         // Add translations
         foreach ($validated['translations'] as $translation) {

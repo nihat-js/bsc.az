@@ -10,14 +10,13 @@ class PageController extends Controller
 {
     public function all()
     {
-        $pages = Page::all();
-
+        $pages = Page::with("translations")->get();
         return response()->json(["message" => "OK", "data" => $pages]);
     }
 
     public function details()
     {
-        $page = Page::find(request()->id);
+        $page = Page::with("translations")->find(request()->id);
 
         if (!$page) {
             return response()->json(["message" => "Page not found"], 404);
@@ -28,8 +27,17 @@ class PageController extends Controller
 
     public function edit()
     {
-        $page = Page::find(request()->id);
+        $validated = request()->validate([
+            "type" => "required|integer",
+            "is_main" => "required|boolean",
+            'is_visible' => 'required|boolean',
+            'image' => 'nullable|string',
 
+            'translations' => 'nullable|array',
+            // 'translations.*.lang_id' => 'required|integer|exists:languages,id', // Validate lang_id
+            // 'translations.*.slug' => 'required  |string|unique:page_translates,slug|max:255',
+        ]);
+        $page = Page::find(request()->id);
         if (!$page) {
             return response()->json(["message" => "Page not found"], 404);
         }
@@ -91,7 +99,7 @@ class PageController extends Controller
         if (!$pages) {
             return response()->json(['message' => 'NOT_FOUND'], 404);
         }
-        
+
         foreach ($pages->translations as $translation) {
             $translation->delete();
         }

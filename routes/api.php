@@ -4,6 +4,8 @@
 
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\admin\PrivilegeController;
+use App\Http\Controllers\admin\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -86,8 +88,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/pages/{id}', [PageController::class, 'delete'])->name('pages.delete');
 
 
+    Route::get('/pages', [PageController::class, 'all'])->name('pages.all');
+    Route::get('/pages/{id}', [PageController::class, 'details'])->name('pages.details');
+    Route::post('/pages', [PageController::class, 'add'])->name('pages.add');
+    Route::put('/pages/{id}', [PageController::class, 'edit'])->name('pages.edit');
+    Route::delete('/pages/{id}', [PageController::class, 'delete'])->name('pages.delete');
+
     
-    // Route::get('/partners', [PartnerController::class, 'all'])->name('partners.all');
+    Route::get('/roles', action: [PrivilegeController::class, 'all'])->name('roles.all');
+    Route::get('/permissions', action: [PrivilegeController::class, 'permissions'])->name('roles.permissions');
+
     // Route::get('/partners/{partner}', [PartnerController::class, 'show'])->name('partners.show');
     // Route::post('/partners', [PartnerController::class, 'add'])->name('partners.add');
     // Route::put('/partners/{partner}', [PartnerController::class, 'edit'])->name('partners.edit');
