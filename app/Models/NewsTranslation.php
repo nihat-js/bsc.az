@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CategoryTranslate extends Model
+class NewsTranslation extends Model
 {
     use HasFactory;
 
     // The table associated with the model.
-    protected $table = 'category_translates';
+    protected $table = 'news_translates';
 
     // Primary key field (optional, since Laravel assumes 'id' by default)
     protected $primaryKey = 'id';
@@ -20,15 +20,16 @@ class CategoryTranslate extends Model
 
     // The attributes that are mass assignable
     protected $fillable = [
-        'category_id',
+        'news_id',
         'lang_id',
         'slug',
         'name',
+        'description',
     ];
 
     // The attributes that should be cast to native types
     protected $casts = [
-        'category_id' => 'integer',
+        'news_id' => 'integer',
         'lang_id' => 'integer',
     ];
 

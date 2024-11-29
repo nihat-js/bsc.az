@@ -38,6 +38,6 @@ class News extends Model
 
     public function translations()
     {
-        return $this->hasMany(NewsTranslate::class, 'news_id', 'id');
+        return $this->hasMany(NewsTranslation::class, 'news_id', 'id');
     }
 }

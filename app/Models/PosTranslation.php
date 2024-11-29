@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class NewsTranslate extends Model
+class PosTranslation extends Model
 {
     use HasFactory;
 
     // The table associated with the model.
-    protected $table = 'news_translates';
+    protected $table = 'pos_translates';
 
     // Primary key field (optional, since Laravel assumes 'id' by default)
     protected $primaryKey = 'id';
@@ -18,21 +18,27 @@ class NewsTranslate extends Model
     // The data type of the primary key
     protected $keyType = 'int';
 
+    // Disable automatic timestamps since the table doesn't have created_at and updated_at columns
+    public $timestamps = true;
+
     // The attributes that are mass assignable
     protected $fillable = [
-        'news_id',
+        'pos_id',
         'lang_id',
         'slug',
         'name',
-        'description',
+        'address',
     ];
 
-    // The attributes that should be cast to native types
-    protected $casts = [
-        'news_id' => 'integer',
-        'lang_id' => 'integer',
-    ];
+    // The relationships (if needed)
 
-    // Optional: Add the created_at and updated_at if not automatically handled
-    public $timestamps = true;
+    public function pos()
+    {
+        return $this->belongsTo(Pos::class, 'pos_id');
+    }
+
+    public function language()
+    {
+        return $this->belongsTo(Language::class, 'lang_id');
+    }
 }

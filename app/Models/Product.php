@@ -39,6 +39,6 @@ class Product extends Model
     }
 
     public function translations(){
-        return $this->hasMany(ProductTranslate::class);
+        return $this->hasMany(ProductTranslation::class);
     }
 }

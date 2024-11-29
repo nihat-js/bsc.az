@@ -42,6 +42,6 @@ class Category extends Model
     ];
 
     public function translations(){
-        return $this->hasMany(CategoryTranslate::class, 'category_id', 'id');
+        return $this->hasMany(CategoryTranslation::class, 'category_id', 'id');
     }
 }

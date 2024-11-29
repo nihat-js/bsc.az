@@ -37,4 +37,9 @@ class Pos extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
+
+    public function translations()
+    {
+        return $this->hasMany(PosTranslation::class, 'pos_id', 'id');
+    }
 }
