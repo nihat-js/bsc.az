@@ -26,17 +26,24 @@ use App\Http\Controllers\User\AuthController as UserAuthController;
 // })->middleware('auth:sanctum');
 
 
-// Route::get("/test",function(){
-// auth("admin")->loginUsingId(1);
-// echo "adsa";
-// $user = auth("admin")->user()-givePermissions("aa");
-// return $user;
-// });
+Route::get("/test", function () {
+    // echo auth()->user();
+    // echo ""
+    // echo "adsa";
+})->middleware("auth:admins");
 
 
-Route::post('register', [UserAuthController::class, 'register']);
-Route::post('login', [UserAuthController::class, 'login']);
-Route::post('logout', [UserAuthController::class, 'logout']);
+Route::get('/admin-dashboard', function () {
+    return response()->json(['message' => 'Welcome to the Admin Dashboard']);
+})->middleware('auth:admins');
+
+
+
+
+
+Route::post('register', [UserAuthController::class, 'register'])->name('register');
+Route::post('login', [UserAuthController::class, 'login'])->name('');
+Route::post('logout', [UserAuthController::class, 'logout'])->name('');
 Route::post('test', [UserAuthController::class, 'test'])->middleware('auth:users');
 
 
@@ -49,7 +56,7 @@ Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.tes
 
 
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(["auth:admins"])->group(function () {
 
     Route::get('/categories', [CategoryController::class, 'all'])->name('categories.all');
     Route::post('/categories', [CategoryController::class, 'add'])->name('categories.add');
@@ -64,11 +71,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/settings/{id}', [SettingController::class, 'edit'])->name('settings.edit');
     Route::delete('/settings/{id}', [SettingController::class, 'delete'])->name('settings.delete');
 
-    
+
     Route::get('/languages', [LanguageController::class, 'all'])->name('languages.all');
     Route::get('/languages/{id}', [LanguageController::class, 'details'])->name('languages.details');
     Route::post('/languages', [LanguageController::class, 'add'])->name('languages.add');
-    Route::put('/languages/{id}', [LanguageController::class, 'update'])->name('languages.update');
+    Route::put('/languages/{id}', [LanguageController::class, 'edit'])->name('languages.edit');
     Route::delete('/languages/{id}', [LanguageController::class, 'delete'])->name('languages.delete');
 
 
@@ -79,9 +86,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/products/{id}', [AdminProductController::class, 'edit'])->name('products.edit');
     Route::delete('/products/{id}', [AdminProductController::class, 'delete'])->name('products.delete');
 
-    
 
-    
+
+
     Route::get('/pages', [PageController::class, 'all'])->name('pages.all');
     Route::get('/pages/{id}', [PageController::class, 'details'])->name('pages.details');
     Route::post('/pages', [PageController::class, 'add'])->name('pages.add');
@@ -104,7 +111,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/news/{id}', [NewsController::class, 'delete'])->name('news.delete');
 
 
-    
+
     Route::get('/roles', action: [PrivilegeController::class, 'all'])->name('roles.all');
     Route::get('/permissions', action: [PrivilegeController::class, 'permissions'])->name('roles.permissions');
 
@@ -114,8 +121,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Route::delete('/partners/{partner}', [PartnerController::class, 'delete'])->name('partners.delete');
 
 
-  
-})->middleware("auth:admins");
+
+});
 
 
 

@@ -45,15 +45,14 @@ class ProductController extends Controller
             'file' => $validated['file'],
         ]);
 
-        if ($validated["images"]){
-            foreach ($validated["images"] as $image){
+        if ($validated["images"]) {
+            foreach ($validated["images"] as $image) {
+                $product->images()->create(["file" => $image]);
                 // save image
             }
-                $product->images()->create(["file" => $image]);
-            }
-            $is_main =
-            $is_visible
-            $image
+            // $is_main =
+            // $is_visible
+            // $image
         }
 
         // Add translations

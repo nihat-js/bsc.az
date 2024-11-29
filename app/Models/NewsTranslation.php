@@ -10,7 +10,7 @@ class NewsTranslation extends Model
     use HasFactory;
 
     // The table associated with the model.
-    protected $table = 'news_translates';
+    protected $table = 'news_translations';
 
     // Primary key field (optional, since Laravel assumes 'id' by default)
     protected $primaryKey = 'id';

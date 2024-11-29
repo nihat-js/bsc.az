@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Models\NewsTranslate;
+use App\Models\NewsTranslation;
 use Illuminate\Http\Request;
 
 
@@ -13,7 +14,7 @@ class NewsController extends Controller
     public function all()
     {
         $page = (int) request()->query("p") ?: 1;
-        $limit = (int) request()->query("l") ?: 10;
+        $limit = (int) request()->query("l") ?: 20;
 
         $products = News::with("translations")->skip(($page - 1) * $limit)->take($limit)->get();
 
@@ -52,7 +53,7 @@ class NewsController extends Controller
 
     public function getBySlug($slug)
     {
-        $newsTranslate = NewsTranslate::where('slug', $slug)->first();
+        $newsTranslate = NewsTranslation::where('slug', $slug)->first();
         $news = News::with("translations")->findOrFail($newsTranslate->id);
 
         return response()->json($news);

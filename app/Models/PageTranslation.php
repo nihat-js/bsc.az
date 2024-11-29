@@ -10,7 +10,7 @@ class PageTranslation extends Model
     use HasFactory;
 
     // The table associated with the model.
-    protected $table = 'page_translates';
+    protected $table = 'page_translations';
 
     // Primary key field (optional, since Laravel assumes 'id' by default)
     protected $primaryKey = 'id';
