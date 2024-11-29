@@ -40,4 +40,8 @@ class Category extends Model
         'type' => 0,           // Defaults to '0'
         'has_url' => false,    // Defaults to '0'
     ];
+
+    public function translations(){
+        return $this->hasMany(CategoryTranslate::class, 'category_id', 'id');
+    }
 }

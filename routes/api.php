@@ -2,6 +2,7 @@
 
 
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\admin\PrivilegeController;
@@ -49,6 +50,12 @@ Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.tes
 
 
 Route::prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/categories', [CategoryController::class, 'all'])->name('categories.all');
+    Route::post('/categories', [CategoryController::class, 'add'])->name('categories.add');
+    Route::get('/categories/{key}', [CategoryController::class, 'details'])->name('categories.details');
+    Route::put('/categories/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->name('categories.delete');
 
 
     Route::get('/settings', [SettingController::class, 'all'])->name('settings.all');
