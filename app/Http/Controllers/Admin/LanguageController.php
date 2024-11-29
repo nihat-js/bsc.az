@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 
 
-class LanguageController 
+class LanguageController
 {
-    public function all() 
+    public function all()
     {
         $languages = Language::all();
         return response()->json($languages, 200);
@@ -31,20 +31,14 @@ class LanguageController
 
     public function details($id)
     {
-        $language = Language::find($id);
-        if (!$language) {
-            return response()->json(['message' => 'Language not found'], 404);
-        }
-        return response()->json($language, 200);
+        $language = Language::findOrFail($id);
+
+        return response()->json(["message" => "OK", "data" => $language], 200);
     }
 
-    public function update(Request $request, $id)
+    public function edit(Request $request, $id)
     {
-        $language = Language::find($id);
-
-        if (!$language) {
-            return response()->json(['message' => 'Language not found'], 404);
-        }
+        $language = Language::findOrFail($id);
 
         $validated = $request->validate([
             'is_visible' => 'sometimes|boolean',
@@ -54,19 +48,14 @@ class LanguageController
 
         $language->update($validated);
 
-        return response()->json($language, 200);
+        return response()->json(["message" => "OK", $language, 200]);
     }
 
     public function delete($id)
     {
-        $language = Language::find($id);
-
-        if (!$language) {
-            return response()->json(['message' => 'Language not found'], 404);
-        }
-
+        $language = Language::findOrFail($id);
         $language->delete();
 
-        return response()->json(['message' => 'Language deleted successfully'], 200);
+        return response()->json(['message' => 'OK'], 200);
     }
 }

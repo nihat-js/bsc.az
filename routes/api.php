@@ -61,7 +61,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/settings', [SettingController::class, 'all'])->name('settings.all');
     Route::post('/settings', [SettingController::class, 'add'])->name('settings.add');
     Route::get('/settings/{key}', [SettingController::class, 'details'])->name('settings.details');
-    Route::put('/settings/{id}', [SettingController::class, 'update'])->name('settings.update');
+    Route::put('/settings/{id}', [SettingController::class, 'edit'])->name('settings.edit');
     Route::delete('/settings/{id}', [SettingController::class, 'delete'])->name('settings.delete');
 
     
@@ -80,12 +80,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/products/{id}', [AdminProductController::class, 'delete'])->name('products.delete');
 
     
-    Route::get('/news', [NewsController::class, 'all'])->name('news.all');
-    Route::post('/news', [NewsController::class, 'add'])->name('news.add');
-    Route::get('/news/slug/{slug}', [NewsController::class, 'getBySlug'])->name('news.getBySlug');
-    Route::get('/news/{id}', [NewsController::class, 'details'])->name('news.details');
-    Route::put('/news/{id}', [NewsController::class, 'edit'])->name('news.edit');
-    Route::delete('/news/{id}', [NewsController::class, 'delete'])->name('news.delete');
 
     
     Route::get('/pages', [PageController::class, 'all'])->name('pages.all');
@@ -100,6 +94,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/pages', [PageController::class, 'add'])->name('pages.add');
     Route::put('/pages/{id}', [PageController::class, 'edit'])->name('pages.edit');
     Route::delete('/pages/{id}', [PageController::class, 'delete'])->name('pages.delete');
+
+
+    Route::get('/news', [NewsController::class, 'all'])->name('news.all');
+    Route::post('/news', [NewsController::class, 'add'])->name('news.add');
+    Route::get('/news/slug/{slug}', [NewsController::class, 'getBySlug'])->name('news.getBySlug');
+    Route::get('/news/{id}', [NewsController::class, 'details'])->name('news.details');
+    Route::put('/news/{id}', [NewsController::class, 'edit'])->name('news.edit');
+    Route::delete('/news/{id}', [NewsController::class, 'delete'])->name('news.delete');
+
 
     
     Route::get('/roles', action: [PrivilegeController::class, 'all'])->name('roles.all');

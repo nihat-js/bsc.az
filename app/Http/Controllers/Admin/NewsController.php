@@ -46,43 +46,31 @@ class NewsController extends Controller
 
         return response()->json([
             'message' => 'OK',
-            'data' => $news->load('translations'),  
+            'data' => $news->load('translations'),
         ], 201);
     }
 
     public function getBySlug($slug)
     {
         $newsTranslate = NewsTranslate::where('slug', $slug)->first();
-        $news = News::with("translations")->find($newsTranslate->id);
+        $news = News::with("translations")->findOrFail($newsTranslate->id);
 
-
-        if (!$news) {
-            return response()->json(['message' => 'News not found'], 404);
-        }
         return response()->json($news);
     }
 
 
     public function details()
     {
-        $product = News::with("translations")->find(request()->id);
-        if (!$product) {
-            return response()->json(['message' => 'NOT_FOUND'], 404);
-        }
+        $product = News::with("translations")->findOrFail(request()->id);
         return response()->json(["message" => "OK", "data" => $product]);
     }
 
 
     public function edit(Request $request, $id)
     {
-        // Find the product
-        $product = News::with('translations')->find($id);
+        $product = News::with('translations')->findOrFail($id);
 
-        if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
 
-        // Validate the request
         $validated = $request->validate([
             'is_visible' => 'sometimes|boolean',
             "image" => "nullable|string",
@@ -120,11 +108,9 @@ class NewsController extends Controller
 
     public function delete()
     {
-        $product = News::with('translations')->find(request()->id);
+        $product = News::with('translations')->findOrFail(request()->id);
 
-        if (!$product) {
-            return response()->json(['message' => 'NOT_FOUND'], 404);
-        }
+
         foreach ($product->translations as $translation) {
             $translation->delete();
         }

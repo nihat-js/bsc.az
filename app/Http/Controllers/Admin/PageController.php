@@ -16,11 +16,8 @@ class PageController extends Controller
 
     public function details()
     {
-        $page = Page::with("translations")->find(request()->id);
+        $page = Page::with("translations")->findOrFail(request()->id);
 
-        if (!$page) {
-            return response()->json(["message" => "Page not found"], 404);
-        }
 
         return response()->json(["message" => "OK", "data" => $page]);
     }
@@ -28,7 +25,7 @@ class PageController extends Controller
     public function edit()
     {
         $validated = request()->validate([
-            "type" => "required|integer",
+            // "type" => "required|integer",
             "is_main" => "required|boolean",
             'is_visible' => 'required|boolean',
             'image' => 'nullable|string',
@@ -37,17 +34,36 @@ class PageController extends Controller
             // 'translations.*.lang_id' => 'required|integer|exists:languages,id', // Validate lang_id
             // 'translations.*.slug' => 'required  |string|unique:page_translates,slug|max:255',
         ]);
-        $page = Page::find(request()->id);
-        if (!$page) {
-            return response()->json(["message" => "Page not found"], 404);
+        $page = Page::findOrFail(request()->id);
+
+        $page->update([
+            // 'type' => $validated['type'],
+            'is_main' => $validated['is_main'],
+            'is_visible' => $validated['is_visible'],
+            'image' => $validated['image'],
+        ]);
+
+        if ($page['translations']) {
+            foreach ($page['translations'] as $translation) {
+                $translation->updateOrCreate(
+                    ['lang_id' => $translation['lang_id'],],
+                    [
+                        'slug' => $translation['slug'],
+                        'name' => $translation['name'],
+                        'description' => $translation['description'],
+                    ]
+                );
+
+            }
         }
+
 
         return response()->json(["message" => "OK", "data" => $page]);
     }
     public function add(Request $request)
     {
         $validated = $request->validate([
-            "type" => "required|integer",
+            // "type" => "required|integer",
             "is_main" => "required|boolean",
             'is_visible' => 'required|boolean',
             'image' => 'nullable|string',
@@ -59,32 +75,27 @@ class PageController extends Controller
         // dd($validated);
 
 
-        // $page = Page::create([
-        //     'type' => $validated['type'],
-        //     'is_main' => $validated['is_main'],
-        //     'is_visible' => $validated['is_visible'],
-        //     'image' => $validated['image'],
-        // ]);
+        $page = Page::create([
+            // 'type' => $validated['type'],
+            'is_main' => $validated['is_main'],
+            'is_visible' => $validated['is_visible'],
+            'image' => $validated['image'],
+        ]);
 
 
-        $translationsData = [];
-        if (@$validated["translations"]) {
-            foreach ($validated["translations"] as $t) {
-                if ($t["slug"]) {
-                    $translationsData[] = [
-                        'lang_id' => $t['lang_id'],
-                        'slug' => $t['slug'],
-                        'title' => $t['title'],
-                        'description' => $t['description'],
-                    ];
-                }
+        if ($validated['translations']) {
+            foreach ($validated['translations'] as $translation) {
+                $page->translations()->create(
+                    [
+                        'lang_id' => $translation['lang_id'],
+                        'slug' => $translation['slug'],
+                        'name' => $translation['name'],
+                        'description' => $translation['description'],
+                    ]
+                );
             }
         }
-        dd($translationsData);
 
-        foreach ($translationsData as $t) {
-            $page->translations()->create($t);
-        }
 
         return response()->json([
             'message' => 'OK',
@@ -94,7 +105,7 @@ class PageController extends Controller
 
     public function delete()
     {
-        $pages = Page::with('translations')->find(request()->id);
+        $pages = Page::with('translations')->findOrFail(request()->id);
 
         if (!$pages) {
             return response()->json(['message' => 'NOT_FOUND'], 404);

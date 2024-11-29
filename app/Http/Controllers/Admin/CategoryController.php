@@ -46,8 +46,7 @@ class CategoryController extends Controller
     }
 
     public function details(Request $request, int $id){
-        $category = Category::with("translations")->find($id);
-
+        $category = Category::with("translations")->findOrFail($id);
         return response()->json($category);
     }
 
@@ -83,7 +82,7 @@ class CategoryController extends Controller
     }
 
     public function delete(){
-        $category = Category::find(request()->id);
+        $category = Category::findOrFail(request()->id);
         $category->translations()->delete();
         $category->delete();
         return response()->json(["message" => "OK"]);

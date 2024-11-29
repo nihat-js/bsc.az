@@ -32,18 +32,18 @@ class SettingController extends Controller
         $setting = Setting::where('key', $key)->first();
 
         if (!$setting) {
-            return response()->json(['message' => 'Setting not found'], Response::HTTP_NOT_FOUND);
+            return response()->json(['message' => 'NOT_FOUND'], Response::HTTP_NOT_FOUND);
         }
 
         return response()->json($setting);
     }
 
-    public function update(Request $request, $id)
+    public function edit(Request $request, $id)
     {
         $setting = Setting::find($id);
 
         if (!$setting) {
-            return response()->json(['message' => 'Setting not found'], Response::HTTP_NOT_FOUND);
+            return response()->json(['message' => 'NOT_FOUND'], Response::HTTP_NOT_FOUND);
         }
 
         $validatedData = $request->validate([
@@ -53,7 +53,7 @@ class SettingController extends Controller
 
         $setting->update($validatedData);
 
-        return response()->json($setting);
+        return response()->json(["message" => "OK", $setting]);
     }
 
 
@@ -62,9 +62,9 @@ class SettingController extends Controller
         $setting = Setting::find($id);
 
         if (!$setting) {
-            return response()->json(['message' => 'Setting not found'], Response::HTTP_NOT_FOUND);
+            return response()->json(['message' => 'NOT_FOUND'], Response::HTTP_NOT_FOUND);
         }
         $setting->delete();
-        return response()->json(['message' => 'Setting deleted successfully'], Response::HTTP_NO_CONTENT);
+        return response()->json(['message' => 'OK'], Response::HTTP_NO_CONTENT);
     }
 }
