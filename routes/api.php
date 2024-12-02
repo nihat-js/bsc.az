@@ -87,6 +87,8 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins"])->group(funct
     Route::post('/products', [AdminProductController::class, 'add'])->name('products.add');
     Route::put('/products/{id}', [AdminProductController::class, 'edit'])->name('products.edit');
     Route::delete('/products/{id}', [AdminProductController::class, 'delete'])->name('products.delete');
+    Route::post("/products/uplodImage", [AdminProductController::class, 'uploadImage'])->name('products.uploadImage');
+    Route::post("products/arrangeImages", [AdminProductController::class, 'arrangeImages'])->name('products.arrangeImages');
 
 
 

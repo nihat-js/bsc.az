@@ -19,6 +19,22 @@ class ProductController extends Controller
         return response()->json(["message" => "OK", "data" => $products]);
     }
 
+    public function uploadImage(){
+        $file = request()->file("file");
+        $newFilename = time(). "_" . random(11111,99999). "." . $file->getClientOriginalExtension();
+        $file->storeAs("public/products", $file->getClientOriginalName());
+        return response()->json(["message" => "OK", "data" => $file->getClientOriginalName()]);
+    }
+
+    public function arrangeImages(){
+        $images = request()->images;
+        foreach ($images as $image) {
+            $image = ProductTranslate::find($image["id"]);
+            $image->update(["order" => $image["order"]]);
+        }
+        return response()->json(["message" => "OK", "data" => $images]);
+    }
+
     public function add(Request $request)
     {
         $validated = $request->validate([
@@ -33,7 +49,7 @@ class ProductController extends Controller
             'translations.*.name' => 'required|string|max:255',
             'translations.*.description' => 'nullable|string',
             "images" => "nullable|array",
-            "images.*." => "string",
+            // "images.*." => "string",
         ]);
 
         // Create the product
@@ -44,12 +60,22 @@ class ProductController extends Controller
             'price' => $validated['price'],
             'file' => $validated['file'],
         ]);
+     
+        ["image1" : "order:1,","imag2","image3"]
 
         if ($validated["images"]) {
-            foreach ($validated["images"] as $image) {
-                $product->images()->create(["file" => $image]);
-                // save image
-            }
+            $product->images()->create([
+                'file' => $images['file'],
+                'is_main' => $images['is_main'] ?? false, // Default to false if not provided
+                'is_visible' => $images['is_visible'] ?? true, // Default to true if not provided
+            ]);
+            // $imagesData = [
+
+            // ]
+            // foreach ($validated["images"] as $image) {
+            //     $product->images()->create(["file" => $image]);
+            //     // save image
+            // }
             // $is_main =
             // $is_visible
             // $image
