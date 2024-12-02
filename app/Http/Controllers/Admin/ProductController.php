@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductTranslate;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,7 @@ class ProductController extends Controller
 
     public function uploadImage(){
         $file = request()->file("file");
-        $newFilename = time(). "_" . random(11111,99999). "." . $file->getClientOriginalExtension();
+        $newFilename = time(). "_" . rand(11111,99999). "." . $file->getClientOriginalExtension();
         $file->storeAs("public/products", $file->getClientOriginalName());
         return response()->json(["message" => "OK", "data" => $file->getClientOriginalName()]);
     }
@@ -29,7 +30,7 @@ class ProductController extends Controller
     public function arrangeImages(){
         $images = request()->images;
         foreach ($images as $image) {
-            $image = ProductTranslate::find($image["id"]);
+            $image = ProductImage::find($image["id"]);
             $image->update(["order" => $image["order"]]);
         }
         return response()->json(["message" => "OK", "data" => $images]);
@@ -61,17 +62,20 @@ class ProductController extends Controller
             'file' => $validated['file'],
         ]);
      
-        ["image1" : "order:1,","imag2","image3"]
+        // ["imdage1" : "order:1,","imag2","image3"]
 
         if ($validated["images"]) {
+            // $
+            $product->images()->update(["product_id" => $product->id]);
             $product->images()->create([
-                'file' => $images['file'],
-                'is_main' => $images['is_main'] ?? false, // Default to false if not provided
-                'is_visible' => $images['is_visible'] ?? true, // Default to true if not provided
+                "path" => $images['path'],
+                "order" => $images['order'] ?? 0, // Default to 0 if not provided
             ]);
+
+            
             // $imagesData = [
 
-            // ]
+            
             // foreach ($validated["images"] as $image) {
             //     $product->images()->create(["file" => $image]);
             //     // save image

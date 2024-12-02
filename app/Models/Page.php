@@ -30,6 +30,6 @@ class Page extends Model
 
     public function translations()
     {
-        return $this->hasMany(PageTranslate::class);
+        return $this->hasMany(PageTranslation::class);
     }
 }

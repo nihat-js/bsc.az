@@ -81,7 +81,6 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins"])->group(funct
 
 
 
-
     Route::get('/products', [AdminProductController::class, 'all'])->name('products.all');
     Route::get('/products/{id}', [AdminProductController::class, 'one'])->name('products.one');
     Route::post('/products', [AdminProductController::class, 'add'])->name('products.add');

@@ -21,15 +21,17 @@ class ProductImage extends Model
     // The attributes that are mass assignable
     protected $fillable = [
         'product_id',
-        'is_main',
-        'is_visible',
-        'image',
+        "path",
+        "order"
     ];
+    
 
     // The attributes that should be cast to native types
     protected $casts = [
-        'is_main' => 'boolean', // Cast 'is_main' to boolean
-        'is_visible' => 'boolean', // Cast 'is_visible' to boolean
+        "path" => "string",
+        
+        // 'is_main' => 'boolean', // Cast 'is_main' to boolean
+        // 'is_visible' => 'boolean', // Cast 'is_visible' to boolean
     ];
 
     // Define relationships

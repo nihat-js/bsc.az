@@ -14,7 +14,7 @@ class PageController extends Controller
         return response()->json(["message" => "OK", "data" => $pages]);
     }
 
-    public function details()
+    public function one()
     {
         $page = Page::with("translations")->findOrFail(request()->id);
 
@@ -66,7 +66,7 @@ class PageController extends Controller
             // "type" => "required|integer",
             "is_main" => "required|boolean",
             'is_visible' => 'required|boolean',
-            'image' => 'nullable|string',
+            'image' => 'nullable|file',
 
             'translations' => 'nullable|array',
             // 'translations.*.lang_id' => 'required|integer|exists:languages,id', // Validate lang_id
@@ -96,6 +96,11 @@ class PageController extends Controller
             }
         }
 
+        if ($validated["file"]) {
+            $file = $validated["file"];
+            $file->storeAs("public/pages", $page->id . "." . $file->extension());
+        }
+
 
         return response()->json([
             'message' => 'OK',
@@ -120,5 +125,7 @@ class PageController extends Controller
             'message' => 'OK',
             // 'data' => $pages
         ], 200);
+        
     }
 }
+
