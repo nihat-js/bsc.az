@@ -9,3 +9,14 @@ export default defineConfig({
         }),
     ],
 });
+
+[
+    "permissions" => ""
+]
+
+[
+    "articles",
+    "categories",
+    "comments",
+    ""
+]

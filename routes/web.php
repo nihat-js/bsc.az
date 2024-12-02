@@ -14,10 +14,10 @@ Route::get('/', function () {
 
 Route::get("/test", function () {
     return "eh";    
-
 });
 
 
 Route::get("/error",function(){
     return response()->json(['message' => 'Unauthorized'], 401);
 })->name("login");
+

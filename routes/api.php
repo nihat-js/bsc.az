@@ -33,12 +33,6 @@ Route::get("/test", function () {
 })->middleware("auth:admins");
 
 
-Route::get('/admin-dashboard', function () {
-    return response()->json(['message' => 'Welcome to the Admin Dashboard']);
-})->middleware('auth:admins');
-
-
-
 
 
 Route::post('register', [UserAuthController::class, 'register'])->name('register');
@@ -56,7 +50,7 @@ Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.tes
 
 
 
-Route::prefix('admin')->name('admin.')->middleware(["auth:admins"])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware([])->group(function () {
 
     Route::get('/categories', [CategoryController::class, 'all'])->name('categories.all');
     Route::post('/categories', [CategoryController::class, 'add'])->name('categories.add');
@@ -112,8 +106,10 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins"])->group(funct
 
 
 
-    Route::get('/roles', action: [PrivilegeController::class, 'all'])->name('roles.all');
-    Route::get('/permissions', action: [PrivilegeController::class, 'permissions'])->name('roles.permissions');
+    Route::get('/roles', action: [PrivilegeController::class, 'all'])->name('privili.all');
+
+    Route::get('/permissions', action: [PrivilegeController::class, 'permissions'])->name('privil.permissions');
+    Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privil.addPermission');
 
     // Route::get('/partners/{partner}', [PartnerController::class, 'show'])->name('partners.show');
     // Route::post('/partners', [PartnerController::class, 'add'])->name('partners.add');
