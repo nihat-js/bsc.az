@@ -9,13 +9,9 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
-    return view('welcome');
+    return "world is here";
+    // return view('welcome');
 });
-
-Route::get("/test", function () {
-    return "eh";    
-});
-
 
 Route::get("/error",function(){
     return response()->json(['message' => 'Unauthorized'], 401);

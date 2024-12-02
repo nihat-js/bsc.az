@@ -13,6 +13,20 @@ class CategoryController extends Controller
         $categories = Category::with("translations")->get();
         return response()->json($categories);
     }
+
+    public function getChild()
+    {
+        $categories = Category::where("parent_id", request()->id)
+            ->with("translations")
+            ->get()
+            ->map(function ($category) {
+                // Check if the category has children
+                $category->is_parent = Category::where("parent_id", $category->id)->exists();
+                return $category;
+            });
+
+        return response()->json($categories);
+    }
     public function add(Request $request)
     {
         $validated = $request->validate([
@@ -45,7 +59,8 @@ class CategoryController extends Controller
         return response()->json($category->load('translations'), 201);
     }
 
-    public function details(Request $request, int $id){
+    public function one(Request $request, int $id)
+    {
         $category = Category::with("translations")->findOrFail($id);
         return response()->json($category);
     }
@@ -81,7 +96,8 @@ class CategoryController extends Controller
         return response()->json($category->load('translations'), 201);
     }
 
-    public function delete(){
+    public function delete()
+    {
         $category = Category::findOrFail(request()->id);
         $category->translations()->delete();
         $category->delete();

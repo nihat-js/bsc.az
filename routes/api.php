@@ -60,10 +60,12 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins"])->group(funct
     Route::delete('/languages/{id}', [LanguageController::class, 'delete'])->name('languages.delete');
 
     Route::get('/categories', [CategoryController::class, 'all'])->name('categories.all');
+    Route::get('/categories/getChild/{id}', [CategoryController::class, 'getChild'])->name('categories.getChild');
     Route::post('/categories', [CategoryController::class, 'add'])->name('categories.add');
     Route::get('/categories/{key}', [CategoryController::class, 'one'])->name('categories.one');
     Route::put('/categories/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
     Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->name('categories.delete');
+
 
 
     Route::get('/settings', [SettingController::class, 'all'])->name('settings.all');

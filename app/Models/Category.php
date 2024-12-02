@@ -17,18 +17,21 @@ class Category extends Model
     protected $fillable = [
         'parent_id',
         'is_visible',
-        'type',
-        'has_url',
-        'redirect_url',
+        'url',
+        // 'type',
+        // 'has_url',
+        // 'redirect_url',
     ];
 
     protected $hidden = [];
 
     // The attributes that should be cast to native types
     protected $casts = [
+        "parent_id" => 'integer',
         'is_visible' => 'boolean',
+        'url' => 'string',
         'type' => 'integer',
-        'has_url' => 'boolean',
+
     ];
 
     // Optional: Add the created_at and updated_at if not automatically handled
