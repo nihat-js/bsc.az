@@ -37,45 +37,51 @@ Route::get("/test", function () {
 
 Route::post('register', [UserAuthController::class, 'register'])->name('register');
 Route::post('login', [UserAuthController::class, 'login'])->name('');
-Route::post('logout', [UserAuthController::class, 'logout'])->name('');
-Route::post('test', [UserAuthController::class, 'test'])->middleware('auth:users');
+Route::post('logout', [UserAuthController::class, 'logout'])->name('')->middleware("auth:users");
+// Route::post('test', [UserAuthController::class, 'test'])->middleware('auth:users');
 
 
 
 Route::post('admin/register', [AdminAuthController::class, 'register'])->name('admin.register');
 Route::post('admin/login', [AdminAuthController::class, 'login'])->name('admin.login');
-Route::post('admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.test')->middleware('auth:admins');
+Route::post('admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout')->middleware("auth:admins");
+// Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.test');
 
 
 
 
-Route::prefix('admin')->name('admin.')->middleware([])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(["auth:admins"])->group(function () {
+
+
+    Route::get('/languages', [LanguageController::class, 'all'])->name('languages.all');
+    Route::get('/languages/{id}', [LanguageController::class, 'one'])->name('languages.one');
+    Route::post('/languages', [LanguageController::class, 'add'])->name('languages.add');
+    Route::put('/languages/{id}', [LanguageController::class, 'edit'])->name('languages.edit');
+    Route::delete('/languages/{id}', [LanguageController::class, 'delete'])->name('languages.delete');
 
     Route::get('/categories', [CategoryController::class, 'all'])->name('categories.all');
     Route::post('/categories', [CategoryController::class, 'add'])->name('categories.add');
-    Route::get('/categories/{key}', [CategoryController::class, 'details'])->name('categories.details');
+    Route::get('/categories/{key}', [CategoryController::class, 'one'])->name('categories.one');
     Route::put('/categories/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
     Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->name('categories.delete');
 
 
     Route::get('/settings', [SettingController::class, 'all'])->name('settings.all');
     Route::post('/settings', [SettingController::class, 'add'])->name('settings.add');
-    Route::get('/settings/{key}', [SettingController::class, 'details'])->name('settings.details');
+    Route::get('/settings/{id}', [SettingController::class, 'one'])->name('settings.one')
+        ->where('id', '[0-9]+');
+    Route::get('/settings/{key}', [SettingController::class, 'oneByKey'])->name('settings.oneByKey')
+        ->where('key', '[A-Za-z]+');
     Route::put('/settings/{id}', [SettingController::class, 'edit'])->name('settings.edit');
     Route::delete('/settings/{id}', [SettingController::class, 'delete'])->name('settings.delete');
 
 
-    Route::get('/languages', [LanguageController::class, 'all'])->name('languages.all');
-    Route::get('/languages/{id}', [LanguageController::class, 'details'])->name('languages.details');
-    Route::post('/languages', [LanguageController::class, 'add'])->name('languages.add');
-    Route::put('/languages/{id}', [LanguageController::class, 'edit'])->name('languages.edit');
-    Route::delete('/languages/{id}', [LanguageController::class, 'delete'])->name('languages.delete');
+
 
 
 
     Route::get('/products', [AdminProductController::class, 'all'])->name('products.all');
-    Route::get('/products/{id}', [AdminProductController::class, 'details'])->name('products.details');
+    Route::get('/products/{id}', [AdminProductController::class, 'one'])->name('products.one');
     Route::post('/products', [AdminProductController::class, 'add'])->name('products.add');
     Route::put('/products/{id}', [AdminProductController::class, 'edit'])->name('products.edit');
     Route::delete('/products/{id}', [AdminProductController::class, 'delete'])->name('products.delete');
@@ -84,14 +90,14 @@ Route::prefix('admin')->name('admin.')->middleware([])->group(function () {
 
 
     Route::get('/pages', [PageController::class, 'all'])->name('pages.all');
-    Route::get('/pages/{id}', [PageController::class, 'details'])->name('pages.details');
+    Route::get('/pages/{id}', [PageController::class, 'one'])->name('pages.one');
     Route::post('/pages', [PageController::class, 'add'])->name('pages.add');
     Route::put('/pages/{id}', [PageController::class, 'edit'])->name('pages.edit');
     Route::delete('/pages/{id}', [PageController::class, 'delete'])->name('pages.delete');
 
 
     Route::get('/pages', [PageController::class, 'all'])->name('pages.all');
-    Route::get('/pages/{id}', [PageController::class, 'details'])->name('pages.details');
+    Route::get('/pages/{id}', [PageController::class, 'one'])->name('pages.one');
     Route::post('/pages', [PageController::class, 'add'])->name('pages.add');
     Route::put('/pages/{id}', [PageController::class, 'edit'])->name('pages.edit');
     Route::delete('/pages/{id}', [PageController::class, 'delete'])->name('pages.delete');
@@ -100,7 +106,7 @@ Route::prefix('admin')->name('admin.')->middleware([])->group(function () {
     Route::get('/news', [NewsController::class, 'all'])->name('news.all');
     Route::post('/news', [NewsController::class, 'add'])->name('news.add');
     Route::get('/news/slug/{slug}', [NewsController::class, 'getBySlug'])->name('news.getBySlug');
-    Route::get('/news/{id}', [NewsController::class, 'details'])->name('news.details');
+    Route::get('/news/{id}', [NewsController::class, 'one'])->name('news.one');
     Route::put('/news/{id}', [NewsController::class, 'edit'])->name('news.edit');
     Route::delete('/news/{id}', [NewsController::class, 'delete'])->name('news.delete');
 

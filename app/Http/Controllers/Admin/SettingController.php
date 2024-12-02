@@ -27,24 +27,22 @@ class SettingController extends Controller
         return response()->json($setting, Response::HTTP_CREATED);
     }
 
-    public function details($key)
+    public function one($id)
     {
-        $setting = Setting::where('key', $key)->first();
+        $setting = Setting::findOrFail($id);
+        return response()->json(["message" => "OK", "data" => $setting]);
+    }
 
-        if (!$setting) {
-            return response()->json(['message' => 'NOT_FOUND'], Response::HTTP_NOT_FOUND);
-        }
-
+    public function oneByKey($key){
+        $setting = Setting::where('key', $key)->firstOrFail();
         return response()->json($setting);
     }
 
     public function edit(Request $request, $id)
     {
-        $setting = Setting::find($id);
+        $setting = Setting::findOrFail($id);
 
-        if (!$setting) {
-            return response()->json(['message' => 'NOT_FOUND'], Response::HTTP_NOT_FOUND);
-        }
+
 
         $validatedData = $request->validate([
             'key' => 'required|string|unique:settings,key,' . $id,
@@ -59,11 +57,7 @@ class SettingController extends Controller
 
     public function delete($id)
     {
-        $setting = Setting::find($id);
-
-        if (!$setting) {
-            return response()->json(['message' => 'NOT_FOUND'], Response::HTTP_NOT_FOUND);
-        }
+        $setting = Setting::findOrFail($id);
         $setting->delete();
         return response()->json(['message' => 'OK'], Response::HTTP_NO_CONTENT);
     }

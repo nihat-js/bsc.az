@@ -19,17 +19,16 @@ class AuthController extends Controller
       
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:admins',
             'password' => 'required|string|min:6',
         ]);
 
-        return response()->json([
-            'message' => 'You are in register'
-        ]);
+        // return response()->json([
+        //     'message' => 'You are in register'
+        // ]);
 
         $user = Admin::create([
-            // 'name' => $validatedData['name'],
-            
+            'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
         ]);
@@ -40,6 +39,12 @@ class AuthController extends Controller
     }
     public function login(Request $request)
     {
+
+        $validatedData = $request->validate([
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:6',
+        ]);
+
         $user = Admin::where('email', $request->email)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
@@ -54,15 +59,6 @@ class AuthController extends Controller
             'token' => $user->createToken('Admin Token')->plainTextToken,
         ]);
     }
-    public function test()
-    {
-        $name = auth()->user()->password;
-        return response()->json([
-            'message' => 'You are in',
-            "name" => $name
-        ]);
-
-    }
 
     public function logout(Request $request)
     {
@@ -74,4 +70,16 @@ class AuthController extends Controller
             ]
         );
     }
+
+    public function test()
+    {
+        $name = auth()->user()->password;
+        return response()->json([
+            'message' => 'You are in',
+            "name" => $name
+        ]);
+
+    }
+
+   
 }
