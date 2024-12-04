@@ -10,10 +10,16 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function all()
+    public function all(Request $request)
     {
         $page = (int) request()->query("p") ?: 1;
         $limit = (int) request()->query("l") ?: 100;
+
+        $filter = $request->filter;
+
+                
+
+
 
         $products = Product::with("translations")->skip(($page - 1) * $limit)->take($limit)->get();
 

@@ -8,6 +8,7 @@ use App\Models\Admin;
 use Hash;
 use Illuminate\Http\Request;
 use Auth;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -48,10 +49,13 @@ class AuthController extends Controller
         $user = Admin::where('email', $request->email)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => ['Username or password incorrect'],
+                'message' => ['Email və ya şifrə yanlışdır'],
             ]);
         }
+        // 660/12=340
+        // 
         // $user->tokens()->delete();
+        // 
         return response()->json([
             'status' => 'success',
             'message' => 'User logged in successfully',
@@ -69,6 +73,17 @@ class AuthController extends Controller
                 'message' => 'User logged out successfully'
             ]
         );
+    }
+
+    public function status(){
+        $user = auth()->user();
+        // Role::create(['name' => 'Super Admin',"guard_name"=>"admins"]);
+        $user->syncRoles('Super Admin');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'OK',
+            // "data" => auth()->user()->getRoleNames()
+        ]);
     }
 
     public function test()

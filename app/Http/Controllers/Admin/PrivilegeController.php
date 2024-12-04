@@ -14,6 +14,7 @@ class PrivilegeController extends Controller
     public function roles()
     {
         $role = auth()->user()->role;
+        dd($role);
         if ($role != "Super Admin") {
             return response()->json(["message" => "You are not allowed to view roles"], 403);
         }
@@ -82,9 +83,7 @@ class PrivilegeController extends Controller
 
     public function permissions(){
         $role = auth()->user()->role;
-        if ($role != "Super Admin") {
-            return response()->json(["message" => "You are not allowed to view permissions"], 403);
-        }
+      
         $permissions = Permission::all();
         return response()->json(["message" => "OK", "data" => $permissions]);
     }

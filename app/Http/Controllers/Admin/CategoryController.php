@@ -32,9 +32,10 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'parent_id' => 'nullable|exists:categories,id',
             'is_visible' => 'required|boolean',
-            'type' => 'required|integer',
-            'has_url' => 'required|boolean',
-            'redirect_url' => 'nullable|string',
+            "url" => "required|string",
+            // 'type' => 'required|integer',
+            // 'has_url' => 'required|boolean',
+            // 'redirect_url' => 'nullable|string',
             'translations' => 'nullable|array',
             'translations.*.lang_id' => 'required|exists:languages,id',
             'translations.*.slug' => 'required|string|unique:category_translates,slug',
@@ -44,7 +45,7 @@ class CategoryController extends Controller
         // dd($validated);
 
         $category = Category::create($validated);
-        if ($validated['translations']) {
+        if (@$validated['translations']) {
             foreach ($validated['translations'] as $translation) {
                 $category->translations()->create(
                     [
@@ -69,10 +70,9 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'parent_id' => 'nullable|exists:categories,id',
-            'is_visible' => 'required|boolean',
-            'type' => 'required|integer',
-            'has_url' => 'required|boolean',
-            'redirect_url' => 'nullable|string',
+            'is_visible' => 'sometimes|boolean',
+            'url' => 'sometimes|string',
+            // 'type' => 'sometimes|integer',
             'translations' => 'nullable|array',
             'translations.*.lang_id' => 'required|exists:languages,id',
             'translations.*.slug' => 'required|string|',
@@ -80,8 +80,10 @@ class CategoryController extends Controller
         ]);
 
         $category = Category::find($request->id);
+        // return response()->json($validated);
+        // dd($validated);
         $category->update($validated);
-        if ($validated['translations']) {
+        if (@$validated['translations']) {
             foreach ($validated['translations'] as $translation) {
                 $category->translations()->updateOrCreate(
                     ['lang_id' => $translation['lang_id']],

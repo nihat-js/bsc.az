@@ -2,11 +2,14 @@
 
 
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\admin\PrivilegeController;
 use App\Http\Controllers\admin\RoleController;
+use App\Http\Controllers\CategoryFilterController;
+use App\Http\Middleware\AdminPermissionMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,7 +26,7 @@ use App\Http\Controllers\User\AuthController as UserAuthController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
-// })->middleware('auth:sanctum');
+// })->middleware('auth:admin');
 
 
 Route::get("/test", function () {
@@ -45,12 +48,13 @@ Route::post('logout', [UserAuthController::class, 'logout'])->name('')->middlewa
 Route::post('admin/register', [AdminAuthController::class, 'register'])->name('admin.register');
 Route::post('admin/login', [AdminAuthController::class, 'login'])->name('admin.login');
 Route::post('admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout')->middleware("auth:admins");
+Route::post("admin/status", [AdminAuthController::class, 'status'])->name('admin.status')->middleware("auth:admins");
 // Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.test');
 
 
 
 
-Route::prefix('admin')->name('admin.')->middleware(["auth:admins"])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(["auth:admins",AdminPermissionMiddleware::class])->group(function () {
 
 
     Route::get('/languages', [LanguageController::class, 'all'])->name('languages.all');
@@ -118,12 +122,29 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins"])->group(funct
     Route::get('/roles', action: [PrivilegeController::class, 'all'])->name('privili.all');
 
     Route::get('/permissions', action: [PrivilegeController::class, 'permissions'])->name('privil.permissions');
+    // Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privil.addPermission'); islenmir rolda avtomatik elave olunur
+
+    
+
+
+
     Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privil.addPermission');
 
     // Route::get('/partners/{partner}', [PartnerController::class, 'show'])->name('partners.show');
     // Route::post('/partners', [PartnerController::class, 'add'])->name('partners.add');
     // Route::put('/partners/{partner}', [PartnerController::class, 'edit'])->name('partners.edit');
     // Route::delete('/partners/{partner}', [PartnerController::class, 'delete'])->name('partners.delete');
+
+    // Route::get("/category-filter/category/{slug}", [CategoryFilterController::class, 'all'])->name('filters.add');
+    // Route::post("/category-filter/", [CategoryFilterController::class, 'edit'])->name('filters.edit');
+
+
+    Route::get("/admins", [AdminController::class, 'all'])->name('admins.all');
+    Route::post("/admin", [AdminController::class, 'add'])->name('admins.add');
+    Route::get("admins/{id}", [AdminAuthController::class, 'one'])->name('admins.one');
+
+    
+
 
 
 

@@ -40,8 +40,8 @@ class Category extends Model
     // Optional: Define default values for attributes
     protected $attributes = [
         'is_visible' => true,  // Defaults to '1'
-        'type' => 0,           // Defaults to '0'
-        'has_url' => false,    // Defaults to '0'
+        // 'type' => 0,           // Defaults to '0'
+        // 'has_url' => false,    // Defaults to '0'
     ];
 
     public function translations(){
