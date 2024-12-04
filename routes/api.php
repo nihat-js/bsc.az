@@ -54,7 +54,7 @@ Route::post("admin/status", [AdminAuthController::class, 'status'])->name('admin
 
 
 
-Route::prefix('admin')->name('admin.')->middleware(["auth:admins",AdminPermissionMiddleware::class])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissionMiddleware::class])->group(function () {
 
 
     Route::get('/languages', [LanguageController::class, 'all'])->name('languages.all');
@@ -119,16 +119,15 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins",AdminPermissio
 
 
 
-    Route::get('/roles', action: [PrivilegeController::class, 'all'])->name('privili.all');
-
-    Route::get('/permissions', action: [PrivilegeController::class, 'permissions'])->name('privil.permissions');
+    Route::get('/roles', action: [PrivilegeController::class, 'roles'])->name('priviliege.roles');
+    Route::get('/permissions', action: [PrivilegeController::class, 'permissions'])->name('privilege.permissions');
     // Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privil.addPermission'); islenmir rolda avtomatik elave olunur
 
-    
 
 
 
-    Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privil.addPermission');
+
+    Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privilege.addPermission');
 
     // Route::get('/partners/{partner}', [PartnerController::class, 'show'])->name('partners.show');
     // Route::post('/partners', [PartnerController::class, 'add'])->name('partners.add');
@@ -140,10 +139,10 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins",AdminPermissio
 
 
     Route::get("/admins", [AdminController::class, 'all'])->name('admins.all');
-    Route::post("/admin", [AdminController::class, 'add'])->name('admins.add');
-    Route::get("admins/{id}", [AdminAuthController::class, 'one'])->name('admins.one');
+    Route::get("/admins/{id}", [AdminController::class, 'one'])->name('admins.one');
+    Route::post("/admins", [AdminController::class, 'add'])->name('admins.add');
 
-    
+
 
 
 

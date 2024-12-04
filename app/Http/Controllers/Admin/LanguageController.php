@@ -26,21 +26,21 @@ class LanguageController
 
         $language = Language::create($validated);
 
-        return response()->json($language, 201);
+        return response()->json(["status" => "ok", "data" => "lang", $language,], 201);
     }
 
     public function one($id)
     {
         $language = Language::findOrFail($id);
 
-        return response()->json(["message" => "OK", "data" => $language], 200);
+        return response()->json(["status" => "ok", "data" => $language], 200);
     }
 
     public function oneByKey($key)
     {
-        $language = Language::where("key",$key)->first();
+        $language = Language::where("key", $key)->first();
 
-        return response()->json(["message" => "OK", "data" => $language], 200);
+        return response()->json(["status" => "ok", "data" => $language], 200);
     }
 
     public function edit(Request $request, $id)
@@ -55,7 +55,7 @@ class LanguageController
 
         $language->update($validated);
 
-        return response()->json(["message" => "OK", "data" => $language], 200);
+        return response()->json(["status" => "ok", "data" => $language], 200);
     }
 
     public function delete($id)
@@ -63,6 +63,6 @@ class LanguageController
         $language = Language::findOrFail($id);
         $language->delete();
 
-        return response()->json(['message' => 'OK'], 200);
+        return response()->json(['status' => 'ok'], 200);
     }
 }

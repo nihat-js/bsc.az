@@ -30,7 +30,14 @@ class AdminController extends Controller
             'name' => 'required|string',
             'email' => 'required|email',
             'password' => 'required|string',
+            "role" => "required|string|"
         ]);
+
+        if (Role:: where("name",$request->role)->count() == 0){
+            return response()->json([
+                'message' => 'Role not found'
+            ], 404);
+        }
 
         $admin = new Admin();
         $admin->name = $request->name;

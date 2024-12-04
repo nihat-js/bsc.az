@@ -57,13 +57,13 @@ class CategoryController extends Controller
             }
         }
 
-        return response()->json($category->load('translations'), 201);
+        return response()->json(["status" => "ok", "data" => $category->load('translations')], 201);
     }
 
     public function one(Request $request, int $id)
     {
         $category = Category::with("translations")->findOrFail($id);
-        return response()->json($category);
+        return response()->json(["status" => "ok", "data" => $category], 200);
     }
 
     public function edit(Request $request)
@@ -103,6 +103,6 @@ class CategoryController extends Controller
         $category = Category::findOrFail(request()->id);
         $category->translations()->delete();
         $category->delete();
-        return response()->json(["message" => "OK"]);
+        return response()->json(["status" => "ok"]);
     }
 }

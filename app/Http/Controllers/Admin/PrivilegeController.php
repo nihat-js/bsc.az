@@ -13,11 +13,14 @@ class PrivilegeController extends Controller
 
     public function roles()
     {
-        $role = auth()->user()->role;
-        dd($role);
-        if ($role != "Super Admin") {
-            return response()->json(["message" => "You are not allowed to view roles"], 403);
-        }
+        // $role = auth()->user()->roles;
+
+        // return response()->json(["message" => "OK", "data" => $role]);
+
+        // dd($role);
+        // if ($role != "Super Admin") {
+        //     return response()->json(["message" => "You are not allowed to view roles"], 403);
+        // }
         $roles = Role::all();
         return response()->json(["message" => "OK", "data" => $roles]);
     }
@@ -44,7 +47,7 @@ class PrivilegeController extends Controller
     {
         $role = auth()->user()->role;
         if ($role != "Super Admin") {
-            return response()->json(["message" => "You are not allowed to delete a role"], 403);
+            return response()->json(["status" => "You are not allowed to delete a role"], 403);
         }
         $validated = request()->validate([
             "name" => "required|string",
@@ -52,7 +55,7 @@ class PrivilegeController extends Controller
 
         $role = Role::where("name", $validated["name"])->first();
         if (!$role) {
-            return response()->json(["message" => "Role not found"], 404);
+            return response()->json(["status" => "Role not found"], 404);
         }
         $role->delete();
     }
@@ -61,7 +64,7 @@ class PrivilegeController extends Controller
     {
         $role = auth()->user()->role;
         if ($role != "Super Admin") {
-            return response()->json(["message" => "You are not allowed to edit a role"], 403);
+            return response()->json(["status" => "You are not allowed to edit a role"], 403);
         }
         $validated = request()->validate([
             "name" => "required|string",
@@ -71,7 +74,7 @@ class PrivilegeController extends Controller
 
         $role = Role::where("name", $validated["name"])->first();
         if (!$role) {
-            return response()->json(["message" => "Role not found"], 404);
+            return response()->json(["status" => "Role not found"], 404);
         }
         $role->name = $validated["new_name"];
         $role->save();
@@ -82,16 +85,17 @@ class PrivilegeController extends Controller
     }
 
     public function permissions(){
-        $role = auth()->user()->role;
+        // $role = auth()->user()->role;
+
       
         $permissions = Permission::all();
-        return response()->json(["message" => "OK", "data" => $permissions]);
+        return response()->json(["status" => "OK", "data" => $permissions]);
     }
 
     public function addPermission(){
         $role = auth()->user()->role;
         if ($role != "Super Admin") {
-            return response()->json(["message" => "You are not allowed to create a permission"], 403);
+            return response()->json(["status" => "You are not allowed to create a permission"], 403);
         }
         $validated = request()->validate([
             "name" => "required|string|unique:permissions,name",
@@ -103,7 +107,7 @@ class PrivilegeController extends Controller
     public function deletePermission(){
         $role = auth()->user()->role;
         if ($role != "Super Admin") {
-            return response()->json(["message" => "You are not allowed to delete a permission"], 403);
+            return response()->json(["status" => "You are not allowed to delete a permission"], 403);
         }
         $validated = request()->validate([
             "name" => "required|string",
@@ -111,7 +115,7 @@ class PrivilegeController extends Controller
 
         $permission = Permission::where("name", $validated["name"])->first();
         if (!$permission) {
-            return response()->json(["message" => "Permission not found"], 404);
+            return response()->json(["status" => "Permission not found"], 404);
         }
         $permission->delete();
     }
@@ -119,7 +123,7 @@ class PrivilegeController extends Controller
     public function editPermission(){
         $role = auth()->user()->role;
         if ($role != "Super Admin") {
-            return response()->json(["message" => "You are not allowed to edit a permission"], 403);
+            return response()->json(["status" => "You are not allowed to edit a permission"], 403);
         }
         $validated = request()->validate([
             "name" => "required|string",
@@ -128,7 +132,7 @@ class PrivilegeController extends Controller
 
         $permission = Permission::where("name", $validated["name"])->first();
         if (!$permission) {
-            return response()->json(["message" => "Permission not found"], 404);
+            return response()->json(["status" => "Permission not found"], 404);
         }
         $permission->name = $validated["new_name"];
         $permission->save();
@@ -137,7 +141,7 @@ class PrivilegeController extends Controller
     public function assignRole(){
         $role = auth()->user()->role;
         if ($role != "Super Admin") {
-            return response()->json(["message" => "You are not allowed to assign a role"], 403);
+            return response()->json(["status" => "You are not allowed to assign a role"], 403);
         }
         $validated = request()->validate([
             "role" => "required|string",
@@ -146,7 +150,7 @@ class PrivilegeController extends Controller
 
         $user = Admin::find($validated["user_id"]);
         if (!$user) {
-            return response()->json(["message" => "User not found"], 404);
+            return response()->json(["status" => "User not found"], 404);
         }
         $user->assignRole($validated["role"]);
     }
