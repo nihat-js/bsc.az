@@ -79,7 +79,9 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
         ->where('id', '[0-9]+');
     Route::get('/settings/{key}', [SettingController::class, 'oneByKey'])->name('settings.oneByKey')
         ->where('key', '[A-Za-z]+');
-    Route::put('/settings/{id}', [SettingController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings/{id}', [SettingController::class, 'edit'])->name('settings.edit')
+    ->where("id", "[0-9]+");
+    Route::put("/settings/bulkUpdate", [SettingController::class, 'bulkUpdate'])->name('settings.bulkUpdate');
     Route::delete('/settings/{id}', [SettingController::class, 'delete'])->name('settings.delete');
 
 

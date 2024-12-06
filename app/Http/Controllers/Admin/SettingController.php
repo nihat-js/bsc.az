@@ -61,4 +61,23 @@ class SettingController extends Controller
         $setting->delete();
         return response()->json(['message' => 'OK'], Response::HTTP_NO_CONTENT);
     }
+
+    public function bulkUpdate(Request $request){
+
+        // $request->validate(
+        //     [
+        //         // "settings" => "required|array",
+        //     ]
+        //     );
+        // dd($request->all());
+        // return $request->all();
+
+        $settings = $request->all();
+        // return $settings;
+        foreach ($settings as $setting){
+            Setting::where('key', $setting["key"])->update(['value' => $setting["value"]]);
+            // return $setting;
+        }
+        return response()->json(['status' => 'OK']);
+    }
 }

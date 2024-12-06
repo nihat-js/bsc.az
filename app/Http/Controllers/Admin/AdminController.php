@@ -12,7 +12,8 @@ class AdminController extends Controller
 {
 
 
-    public function __construct(){
+    public function __construct()
+    {
         // $role = auth()->user()->role;
         // if ($role != "Super Admin"){
         //     return response()->json([
@@ -21,11 +22,13 @@ class AdminController extends Controller
         // }
     }
 
-    public function all(){
+    public function all()
+    {
         return Admin::with('roles')->get();
     }
 
-    public function add(Request $request){
+    public function add(Request $request)
+    {
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
@@ -33,7 +36,7 @@ class AdminController extends Controller
             "role" => "required|string|"
         ]);
 
-        if (Role:: where("name",$request->role)->count() == 0){
+        if (Role::where("name", $request->role)->count() == 0) {
             return response()->json([
                 'message' => 'Role not found'
             ], 404);
@@ -51,15 +54,25 @@ class AdminController extends Controller
         ], 201);
     }
 
-    public function details($id){
-        $admin = Admin::findOrFail($id);
+    public function one($id)
+    {
+        $admin = Admin::findOrFail($id)->with("roles")->get();
+
+        return response()->json(
+            [
+                "status" => "ok",
+                'data' => $admin
+            ],
+            200
+        );
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
 
 
         $admin = Admin::findOrFail($id);
-        if ($admin->role == "Super Admin"){
+        if ($admin->role == "Super Admin") {
             return response()->json([
                 'message' => 'Əsas admin silinə bilməz'
             ], 403);
@@ -72,7 +85,8 @@ class AdminController extends Controller
         ], 200);
     }
 
-    public function edit(Request $request,$id){
+    public function edit(Request $request, $id)
+    {
 
 
         $admin = Admin::findOrFail($id);
@@ -85,7 +99,7 @@ class AdminController extends Controller
         ]);
 
         $admin->update($validatedData);
-        $role = Role::where("name",$validatedData["role"])->firstOrFail();
+        $role = Role::where("name", $validatedData["role"])->firstOrFail();
         $admin->role()->sync($role->id);
 
 
