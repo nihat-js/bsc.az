@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageController;
-use App\Http\Controllers\admin\PrivilegeController;
+use App\Http\Controllers\Admin\PrivilegeController;
 use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\CategoryFilterController;
 use App\Http\Middleware\AdminPermissionMiddleware;
