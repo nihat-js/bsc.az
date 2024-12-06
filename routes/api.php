@@ -29,9 +29,18 @@ use App\Http\Controllers\User\AuthController as UserAuthController;
 // })->middleware('auth:admin');
 
 
-Route::get("/test", function () {
-    // echo auth()->user();
+Route::get("/developer-test", function () {
+
+    $user = auth()->user();
+    // $user->assignRole("Super Admin");
+    $user->syncRoles(["Super Admin"]);
+
+    return $user;
+    // return $user;
+
     // echo ""
+
+    // echo auth()->user();
     // echo "adsa";
 })->middleware("auth:admins");
 
@@ -125,11 +134,6 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::get('/roles', action: [PrivilegeController::class, 'roles'])->name('priviliege.roles');
     Route::get('/permissions', action: [PrivilegeController::class, 'permissions'])->name('privilege.permissions');
     // Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privil.addPermission'); islenmir rolda avtomatik elave olunur
-
-
-
-
-
     Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privilege.addPermission');
 
     // Route::get('/partners/{partner}', [PartnerController::class, 'show'])->name('partners.show');
@@ -144,6 +148,8 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::get("/admins", [AdminController::class, 'all'])->name('admins.all');
     Route::get("/admins/{id}", [AdminController::class, 'one'])->name('admins.one');
     Route::post("/admins", [AdminController::class, 'add'])->name('admins.add');
+    Route::put("/admins/{id}", [AdminController::class, 'edit'])->name('admins.edit');
+    Route::delete("/admins/{id}", [AdminController::class, 'delete'])->name('admins.delete');
 
 
 

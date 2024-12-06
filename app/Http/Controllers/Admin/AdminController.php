@@ -24,16 +24,22 @@ class AdminController extends Controller
 
     public function all()
     {
-        return Admin::with('roles')->get();
+
+        $admins = Admin::with('roles')->get()->map(function ($admin) {
+            $admin->role = $admin->roles->first()->name ?? null;
+            unset($admin->roles);
+            return $admin;
+        });
+        return response()->json($admins);
     }
 
     public function add(Request $request)
     {
         $request->validate([
             'name' => 'required|string',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:admins,email',
             'password' => 'required|string',
-            "role" => "required|string|"
+            "role" => "required|string"
         ]);
 
         if (Role::where("name", $request->role)->count() == 0) {
@@ -48,9 +54,11 @@ class AdminController extends Controller
         $admin->password = Hash::make($request->password);
         $admin->save();
 
+        $admin->assignRole($request->role);
         return response()->json([
+            "status" => "ok",
             'message' => 'Admin created successfully',
-            'admin' => $admin
+            'data' => $admin
         ], 201);
     }
 
@@ -69,11 +77,10 @@ class AdminController extends Controller
 
     public function delete($id)
     {
-
-
         $admin = Admin::findOrFail($id);
         if ($admin->role == "Super Admin") {
             return response()->json([
+                "status" => "error",
                 'message' => 'Əsas admin silinə bilməz'
             ], 403);
         }
@@ -88,25 +95,35 @@ class AdminController extends Controller
     public function edit(Request $request, $id)
     {
 
+    $admin = Admin::findOrFail($id);
 
-        $admin = Admin::findOrFail($id);
+    $validatedData = $request->validate([
+        'name' => 'sometimes|string',
+        'email' => 'sometimes|email',
+        'password' => 'sometimes|string', 
+        'role' => 'sometimes|string'  
+    ]);
 
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|string',
-            "role" => "string"
-        ]);
+    if (!empty($validatedData['password'])) {
+        $validatedData['password'] = Hash::make($validatedData['password']);
+    } else {
+        unset($validatedData['password']);
+    }
 
-        $admin->update($validatedData);
+    $admin->update($validatedData);
+
+    if (isset($validatedData['role'])) {
         $role = Role::where("name", $validatedData["role"])->firstOrFail();
-        $admin->role()->sync($role->id);
+        $admin->syncRoles([$role->name]);  //
+    }
 
+    $admin->role = $admin->roles->first()->name ?? null;
 
-        return response()->json([
-            'message' => 'Admin updated successfully',
-            'admin' => $admin
-        ], 200);
+    return response()->json([
+        "status" => "ok",
+        'message' => 'Admin updated successfully',
+        'data' => $admin
+    ], 200);
 
     }
 }
