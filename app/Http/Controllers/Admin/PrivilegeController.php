@@ -22,6 +22,9 @@ class PrivilegeController extends Controller
         //     return response()->json(["message" => "You are not allowed to view roles"], 403);
         // }
         $roles = Role::all();
+        $roles = $roles->map(function ($role) {
+            return $role->name;
+        });
         return response()->json(["message" => "OK", "data" => $roles]);
     }
     public function addRole()
