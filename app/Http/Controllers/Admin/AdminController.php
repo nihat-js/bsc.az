@@ -78,7 +78,7 @@ class AdminController extends Controller
     public function delete($id)
     {
         $admin = Admin::findOrFail($id);
-        if ($admin->role == "Super Admin") {
+        if ($admin->roles->first()->name == "Super Admin") {
             return response()->json([
                 "status" => "error",
                 'message' => 'Əsas admin silinə bilməz'

@@ -34,8 +34,7 @@ Route::get("/developer-test", function () {
     $user = auth()->user();
     // $user->assignRole("Super Admin");
     $user->syncRoles(["Super Admin"]);
-
-    return $user;
+    return $user->roles->first()->name;
     // return $user;
 
     // echo ""
