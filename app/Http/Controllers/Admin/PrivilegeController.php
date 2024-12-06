@@ -88,7 +88,10 @@ class PrivilegeController extends Controller
         // $role = auth()->user()->role;
 
       
-        $permissions = Permission::all();
+        $permissions = Permission::where("guard_name","admins")->get();
+        $permissions = $permissions->map(function ($permission) {
+            return $permission->name;
+        });
         return response()->json(["status" => "OK", "data" => $permissions]);
     }
 
