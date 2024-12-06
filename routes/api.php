@@ -149,6 +149,7 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::post("/admins", [AdminController::class, 'add'])->name('admins.add');
     Route::put("/admins/{id}", [AdminController::class, 'edit'])->name('admins.edit');
     Route::delete("/admins/{id}", [AdminController::class, 'delete'])->name('admins.delete');
+    Route::delete("/admins", [AdminController::class, 'bulkDelete'])->name('admins.bulkDelete');
 
 
 

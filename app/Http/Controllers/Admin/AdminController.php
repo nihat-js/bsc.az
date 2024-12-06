@@ -92,6 +92,25 @@ class AdminController extends Controller
         ], 200);
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->ids;
+        $admins = Admin::whereIn('id', $ids)->get();
+        foreach ($admins as $admin) {
+            if ($admin->roles->first()->name == "Super Admin") {
+                return response()->json([
+                    "status" => "error",
+                    'message' => 'Əsas admin silinə bilməz'
+                ], 403);
+            }
+        }
+        Admin::destroy($ids);
+        return response()->json([
+            "status" => "ok",
+            'message' => 'Admins deleted successfully'
+        ], 200);
+    }
+
     public function edit(Request $request, $id)
     {
 

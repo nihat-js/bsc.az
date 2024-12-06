@@ -72,7 +72,7 @@ class SettingController extends Controller
         // dd($request->all());
         // return $request->all();
 
-        $settings = $request->all();
+        $settings = $request->data;
         // return $settings;
         foreach ($settings as $setting){
             Setting::where('key', $setting["key"])->update(['value' => $setting["value"]]);
