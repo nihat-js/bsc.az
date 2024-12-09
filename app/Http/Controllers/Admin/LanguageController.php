@@ -26,7 +26,7 @@ class LanguageController
 
         $language = Language::create($validated);
 
-        return response()->json(["status" => "ok", "data" => "lang", $language,], 201);
+        return response()->json(["status" => "ok", "data" => $language,], 201);
     }
 
     public function one($id)
