@@ -10,7 +10,10 @@ class CategoryController extends Controller
 {
     public function all()
     {
-        $categories = Category::with("translations")->get();
+        // dd("e");
+        $categories = Category::with("translations")
+            ->where("parent_id", null)
+            ->get();
         return response()->json($categories);
     }
 
@@ -38,7 +41,7 @@ class CategoryController extends Controller
             // 'redirect_url' => 'nullable|string',
             'translations' => 'nullable|array',
             'translations.*.lang_id' => 'required|exists:languages,id',
-            'translations.*.slug' => 'required|string|unique:category_translates,slug',
+            'translations.*.slug' => 'required|string|unique:category_translations,slug',
             'translations.*.name' => 'required|string',
         ]);
 

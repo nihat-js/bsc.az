@@ -69,7 +69,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(
             [
-                'status' => 'success',
+                'status' => 'ok',
                 'message' => 'User logged out successfully'
             ]
         );
@@ -77,12 +77,10 @@ class AuthController extends Controller
 
     public function status(){
         $user = auth()->user();
-        // Role::create(['name' => 'Super Admin',"guard_name"=>"admins"]);
-        $user->syncRoles('Super Admin');
         return response()->json([
-            'status' => 'success',
-            'message' => 'OK',
-            // "data" => auth()->user()->getRoleNames()
+            'status' => 'ok',
+            'message' => 'User is logged in',
+            "data" => $user
         ]);
     }
 
