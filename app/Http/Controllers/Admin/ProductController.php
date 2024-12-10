@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
+use DB;
 use Illuminate\Http\Request;
+use Str;
 
 class ProductController extends Controller
 {
@@ -14,12 +16,14 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             "category_id" => "required|integer|exists:categories,id",
+            "name" => "required|string|max:255",
             'price' => 'required|numeric|min:0',
-            "slug" => "required|string",
-            "is_visible" => "sometimes|boolean|default:true",
+            "discount_price" => "nullable|numeric|min:0",
+            "is_visible" => "sometimes|boolean",
+            "weight" => "nullable|string",
+            "dimension" => "nullable|string",
 
-
-            'translations' => 'required|array',
+            'translations' => 'sometimes|array',
             'translations.*.lang_id' => 'required|integer|exists:languages,id', // Validate lang_id
             'translations.*.name' => 'required|string|max:255',
             'translations.*.description' => 'nullable|string',
@@ -29,48 +33,49 @@ class ProductController extends Controller
             // "images.*." => "string",
         ]);
 
-        // Create the product
-        $product = Product::create([
-            'is_visible' => $validated['is_visible'],
-            'add_basket' => $validated['add_basket'],
-            'discount_price' => $validated['discount_price'],
-            'price' => $validated['price'],
-            'file' => $validated['file'],
-        ]);
+        DB::beginTransaction();
 
-        foreach ($validated['translations'] as $translation) {
-            $product->translations()->create($translation);
-        }
+        $validated["slug"] = Str::slug($validated['name']);
+        
+        // return response()->json($validated);
 
-        if (@$validated["specs"]) {
-            foreach ($validated["specs"] as $spec) {
-                $product->specs()->create($spec);
-            }
-        }
+        $product = Product::create($validated);
 
-        // ["imdage1" : "order:1,","imag2","image3"]
+        // if (@$validated["translations"]){
+        //     foreach ($validated['translations'] as $translation) {
+        //         $product->translations()->create($translation);
+        //     }
+        // }
 
-        if (@$validated["images"]) {
-            foreach ($validated["images"] as $index => $image) {
-                // Generate a random filename with timestamp
-                $filename = time() . '_' . str_random(10) . '.' . $image->getClientOriginalExtension();
-
-                // Store the image with the new filename
-                $image->storeAs("public/products", $filename);
-
-                // Save image details in the database
-                $product->images()->create([
-                    "path" => "products/" . $filename, // Store relative path in the database
-                    "order" => ++$index,
-                ]);
-            }
-        }
+        // if (@$validated["specs"]) {
+        //     foreach ($validated["specs"] as $spec) {
+        //         $product->specs()->create($spec);
+        //     }
+        // }
 
 
+        // if (@$validated["images"]) {
+        //     foreach ($validated["images"] as $index => $image) {
+        //         // Generate a random filename with timestamp
+        //         $filename = time() . '_' . str_random(10) . '.' . $image->getClientOriginalExtension();
+
+        //         // Store the image with the new filename
+        //         $image->storeAs("public/products", $filename);
+
+        //         // Save image details in the database
+        //         $product->images()->create([
+        //             "path" => "products/" . $filename, // Store relative path in the database
+        //             "order" => ++$index,
+        //         ]);
+        //     }
+        // }
+
+
+        DB::commit();
 
         return response()->json([
             'message' => 'Product created successfully',
-            'data' => $product->load('translations'), // Include translations in the response
+            // 'data' => $product->load('translations'), // Include translations in the response
         ], 201);
     }
 

@@ -9,23 +9,24 @@ class Product extends Model
 {
     use HasFactory;
     protected $table = 'products';
-
     protected $primaryKey = 'id';
-
     protected $keyType = 'int';
-
     protected $fillable = [
         "category_id",
-        "price",
+        "name",
         "slug",
+        "price",
+        "discount_price",
         "is_visible",
         "cover_image",
+        "country_id",
+        "brand_id",
+        "weight",
+        "dimension",
+        // color
     ];
-
     protected $casts = [
-        // 'is_visible' => 'boolean', // Cast 'is_visible' to a boolean
-        // 'add_basket' => 'boolean', // Cast 'add_basket' to a boolean
-        // 'discount_price' => 'double', // Cast 'discount_price' to a double
+        'discount_price' => 'double', // Cast 'discount_price' to a double
         'price' => 'double', // Cast 'price' to a double
     ];
 
