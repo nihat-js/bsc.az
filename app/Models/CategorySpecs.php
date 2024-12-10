@@ -13,6 +13,12 @@ class CategorySpecs extends Model
         'show_in_filter',
     ];
 
+    public function casts(){
+        return [
+            'show_in_filter' => 'boolean'
+        ];
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
