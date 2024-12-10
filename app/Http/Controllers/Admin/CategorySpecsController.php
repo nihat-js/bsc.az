@@ -9,6 +9,46 @@ use Illuminate\Http\Request;
 
 class CategorySpecsController extends Controller
 {
+
+    public function add(Request $request)
+    {
+
+        DB::beginTransaction();
+        $request->validate([
+            "category_id" => "required|exists:categories,id",
+            "name" => "string|required", // default olaraq az dilde olmalidir diglerini translationla elave edeceyik
+            "group_id" => "nullable|integer",
+            "show_in_filter" => "nullable|boolean",
+            "translations" => "nullable|array",
+            "translations.*.lang_code" => "required|string|exists:languages,code",
+        ]);
+
+
+        $categorySpecs = CategorySpecs::create([
+            "category_id" => $request->category_id,
+            "name" => $request->name,
+            "group_id" => $request->group_id,
+            "show_in_filter" => $request->show_in_filter,
+        ]);
+
+        if ($request->translations) {
+            foreach ($request->translations as $index => $translation) {
+                $categorySpecs->translations()->create([
+                    "table_name" => "category_specs",
+                    "lang_code" => $translation["lang_code"],
+                    "text" => $translation["text"],
+                ]);
+            }
+        }
+
+        DB::commit();
+
+        return response()->json([
+            "status" => "ok",
+            "message" => "Category Specs created"
+        ]);
+    }
+
     public function all()
     {
         $categorySpecs = CategorySpecs::with("category.translations")->get();
@@ -37,44 +77,10 @@ class CategorySpecsController extends Controller
         ]);
     }
 
-    public function add(Request $request)
+    
+
+    public function delete()
     {
-
-        DB::beginTransaction();
-        $request->validate([
-            "category_id" => "required|exists:categories,id",
-            "name" => "string|required", // default olaraq az dilde olmalidir diglerini translationla elave edeceyik
-            "group_id" => "nullable|integer",
-            "show_in_filter" => "nullable|boolean",
-            "translations" => "nullable|array",
-            "translations.*.lang_code" => "required|string|exists:languages,code",
-        ]);
-
-
-        $categorySpecs = CategorySpecs::create([
-            "category_id" => $request->category_id,
-            "name" => $request->name,
-            "group_id" => $request->group_id,
-            "show_in_filter" => $request->show_in_filter,
-        ]);
-
-        foreach ($request->translations as $index => $translation) {
-            $categorySpecs->translations()->create([
-                "table_name" => "category_specs",
-                "lang_code" => $translation["lang_code"],
-                "text" => $translation["text"],
-            ]);
-        }
-
-        DB::commit();
-
-        return response()->json([
-            "status" => "ok",
-            "message" => "Category Specs created"
-        ]);
-    }
-
-    public function delete(){
 
     }
 

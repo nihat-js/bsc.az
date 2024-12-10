@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use DB;
 use Illuminate\Http\Request;
+use Str;
 
 class CategoryController extends Controller
 {
@@ -34,37 +36,41 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'parent_id' => 'nullable|exists:categories,id',
-            'is_visible' => 'required|boolean',
-            "url" => "required|string",
-            // 'type' => 'required|integer',
-            // 'has_url' => 'required|boolean',
-            // 'redirect_url' => 'nullable|string',
+            'is_visible' => 'boolean',
+            "name" => "required|string",
+            // "slug" => "required|string|unique:categories,slug",// avtomatik
             'translations' => 'nullable|array',
-            'translations.*.lang_id' => 'required|exists:languages,id',
-            'translations.*.slug' => 'required|string|unique:category_translations,slug',
+            'translations.*.lang_code' => 'required|exists:languages,code',
             'translations.*.name' => 'required|string',
+            // 'translations.*.slug' => 'required|string|unique:category_translations,slug',
         ]);
-
         // dd($validated);
 
+        $validated["slug"] = Str::slug($validated["name"]);
+        
+        DB::beginTransaction();
         $category = Category::create($validated);
-        if (@$validated['translations']) {
+        if (@$validated["translations"]) {
             foreach ($validated['translations'] as $translation) {
                 $category->translations()->create(
                     [
-                        'lang_id' => $translation['lang_id'],
+                        'lang_code' => $translation['lang_code'],
                         'name' => $translation['name'],
-                        'slug' => $translation['slug'],
+                        "slug" => Str::slug($translation['name'])
+                        // 'slug' => $translation['slug'],
+
                     ]
                 );
             }
         }
+        DB::commit();
 
         return response()->json(["status" => "ok", "data" => $category->load('translations')], 201);
     }
 
     public function one(Request $request, int $id)
     {
+        // return response()->json($id);
         $category = Category::with("translations")->findOrFail($id);
         return response()->json(["status" => "ok", "data" => $category], 200);
     }
@@ -73,27 +79,24 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'parent_id' => 'nullable|exists:categories,id',
-            'is_visible' => 'sometimes|boolean',
-            'url' => 'sometimes|string',
-            // 'type' => 'sometimes|integer',
+            'is_visible' => 'nullable|boolean',
+            "name" => "nullable|string",
+            "slug" => "nullable|string",// avtomatik
             'translations' => 'nullable|array',
-            'translations.*.lang_id' => 'required|exists:languages,id',
-            'translations.*.slug' => 'required|string|',
-            'translations.*.name' => 'required|string',
+            'translations.*.lang_code' => 'required|exists:languages,code',
+            'translations.*.name' => 'nullable|string',
+            'translations.*.slug' => 'nullable|string',
         ]);
 
-        $category = Category::find($request->id);
         // return response()->json($validated);
+        $category = Category::findOrFail($request->id);
         // dd($validated);
         $category->update($validated);
         if (@$validated['translations']) {
             foreach ($validated['translations'] as $translation) {
                 $category->translations()->updateOrCreate(
-                    ['lang_id' => $translation['lang_id']],
-                    [
-                        'name' => $translation['name'],
-                        'slug' => $translation['slug'],
-                    ]
+                    ['lang_code' => $translation['lang_code']],
+                    $translation
                 );
             }
         }
@@ -106,6 +109,6 @@ class CategoryController extends Controller
         $category = Category::findOrFail(request()->id);
         $category->translations()->delete();
         $category->delete();
-        return response()->json(["status" => "ok"]);
+        return response()->json(["status" => "ok","message"=>"Category deleted"], 200);
     }
 }
