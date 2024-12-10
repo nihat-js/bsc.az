@@ -12,11 +12,18 @@ use Str;
 class ProductController extends Controller
 {
 
+    public function one(){
+        $product = Product::with("translations")
+        ->with("specs")
+        ->findOrFail(request()->id);
+        return response()->json(["message" => "ok", "data" => $product]);
+    }
     public function add(Request $request)
     {
         $validated = $request->validate([
             "category_id" => "required|integer|exists:categories,id",
             "name" => "required|string|max:255",
+            "description" => "nullable|string",
             'price' => 'required|numeric|min:0',
             "discount_price" => "nullable|numeric|min:0",
             "is_visible" => "sometimes|boolean",
@@ -24,7 +31,7 @@ class ProductController extends Controller
             "dimension" => "nullable|string",
 
             'translations' => 'sometimes|array',
-            'translations.*.lang_id' => 'required|integer|exists:languages,id', // Validate lang_id
+            'translations.*.lang_code' => 'required|string|exists:languages,code', // Validate lang_id
             'translations.*.name' => 'required|string|max:255',
             'translations.*.description' => 'nullable|string',
 
@@ -34,24 +41,22 @@ class ProductController extends Controller
         ]);
 
         DB::beginTransaction();
-
         $validated["slug"] = Str::slug($validated['name']);
         
         // return response()->json($validated);
-
         $product = Product::create($validated);
+        if (@$validated["translations"]){
+            foreach ($validated['translations'] as $translation) {
+                $translation["slug"] = Str::slug($translation['name']);
+                $product->translations()->create($translation);
+            }
+        }
 
-        // if (@$validated["translations"]){
-        //     foreach ($validated['translations'] as $translation) {
-        //         $product->translations()->create($translation);
-        //     }
-        // }
-
-        // if (@$validated["specs"]) {
-        //     foreach ($validated["specs"] as $spec) {
-        //         $product->specs()->create($spec);
-        //     }
-        // }
+        if (@$validated["specs"]) {
+            foreach ($validated["specs"] as $spec) {
+                $product->specs()->create($spec);
+            }
+        }
 
 
         // if (@$validated["images"]) {
@@ -86,7 +91,9 @@ class ProductController extends Controller
 
         $filter = $request->filter;
 
-        $products = Product::with("translations")->skip(($page - 1) * $limit)->take($limit)->get();
+        $products = Product::with("translations")
+        ->with("specs")
+        ->skip(($page - 1) * $limit)->take($limit)->get();
 
         return response()->json(["message" => "OK", "data" => $products]);
     }
@@ -168,22 +175,29 @@ class ProductController extends Controller
 
 
 
-    public function delete()
+    public function delete(Request $request)
     {
-        $product = Product::with('translations')->find(request()->id);
 
-        if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
+        // return response()->json([
+        //     'status' => 'ok',
+        //     'message' => 'Product deleted successfully',
+        //     'data' => "roduct"
+        // ], 200);
 
-        foreach ($product->translations as $translation) {
-            $translation->delete();
-        }
+
+        $product = Product::findOrFail($request->id);
+        DB::beginTransaction();
+        $product->translations()->delete();
+        $product->specs()->delete();
         $product->delete();
+        // $product->images()->delete();
+
+        DB::commit();
 
         return response()->json([
+            'status' => 'ok',
             'message' => 'Product and its translations deleted successfully',
-            'data' => $product
+            // 'data' => $product
         ], 200);
     }
 

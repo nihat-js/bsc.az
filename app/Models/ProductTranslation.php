@@ -9,14 +9,14 @@ class ProductTranslation extends Model
 {
     use HasFactory;
 
-    protected $table = 'product_translates';
+    protected $table = 'product_translations';
 
     protected $primaryKey = 'id';
 
     protected $keyType = 'int';
     protected $fillable = [
         'product_id',
-        'lang_id',
+        'lang_code',
         'slug',
         'name',
         'description',

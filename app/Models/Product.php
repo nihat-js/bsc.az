@@ -13,8 +13,11 @@ class Product extends Model
     protected $keyType = 'int';
     protected $fillable = [
         "category_id",
+
         "name",
         "slug",
+        "description",
+        
         "price",
         "discount_price",
         "is_visible",
