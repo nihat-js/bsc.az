@@ -9,52 +9,23 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function all(Request $request)
-    {
-        $page = (int) request()->query("p") ?: 1;
-        $limit = (int) request()->query("l") ?: 100;
-
-        $filter = $request->filter;
-
-                
-
-
-
-        $products = Product::with("translations")->skip(($page - 1) * $limit)->take($limit)->get();
-
-        return response()->json(["message" => "OK", "data" => $products]);
-    }
-
-    public function uploadImage(){
-        $file = request()->file("file");
-        $newFilename = time(). "_" . rand(11111,99999). "." . $file->getClientOriginalExtension();
-        $file->storeAs("public/products", $file->getClientOriginalName());
-        return response()->json(["message" => "OK", "data" => $file->getClientOriginalName()]);
-    }
-
-    public function arrangeImages(){
-        $images = request()->images;
-        foreach ($images as $image) {
-            $image = ProductImage::find($image["id"]);
-            $image->update(["order" => $image["order"]]);
-        }
-        return response()->json(["message" => "OK", "data" => $images]);
-    }
 
     public function add(Request $request)
     {
         $validated = $request->validate([
-            'is_visible' => 'required|boolean',
-            'add_basket' => 'required|boolean',
-            'discount_price' => 'nullable|numeric|min:0',
+            "category_id" => "required|integer|exists:categories,id",
             'price' => 'required|numeric|min:0',
-            'file' => 'nullable|string',
+            "slug" => "required|string",
+            "is_visible" => "sometimes|boolean|default:true",
+
+
             'translations' => 'required|array',
             'translations.*.lang_id' => 'required|integer|exists:languages,id', // Validate lang_id
-            'translations.*.slug' => 'required|string|unique:product_translates,slug|max:255',
             'translations.*.name' => 'required|string|max:255',
             'translations.*.description' => 'nullable|string',
+
             "images" => "nullable|array",
+            "specs" => "nullable|array",
             // "images.*." => "string",
         ]);
 
@@ -66,34 +37,36 @@ class ProductController extends Controller
             'price' => $validated['price'],
             'file' => $validated['file'],
         ]);
-     
-        // ["imdage1" : "order:1,","imag2","image3"]
 
-        if ($validated["images"]) {
-            // $
-            $product->images()->update(["product_id" => $product->id]);
-            $product->images()->create([
-                "path" => $images['path'],
-                "order" => $images['order'] ?? 0, // Default to 0 if not provided
-            ]);
-
-            
-            // $imagesData = [
-
-            
-            // foreach ($validated["images"] as $image) {
-            //     $product->images()->create(["file" => $image]);
-            //     // save image
-            // }
-            // $is_main =
-            // $is_visible
-            // $image
-        }
-
-        // Add translations
         foreach ($validated['translations'] as $translation) {
             $product->translations()->create($translation);
         }
+
+        if (@$validated["specs"]) {
+            foreach ($validated["specs"] as $spec) {
+                $product->specs()->create($spec);
+            }
+        }
+
+        // ["imdage1" : "order:1,","imag2","image3"]
+
+        if (@$validated["images"]) {
+            foreach ($validated["images"] as $index => $image) {
+                // Generate a random filename with timestamp
+                $filename = time() . '_' . str_random(10) . '.' . $image->getClientOriginalExtension();
+
+                // Store the image with the new filename
+                $image->storeAs("public/products", $filename);
+
+                // Save image details in the database
+                $product->images()->create([
+                    "path" => "products/" . $filename, // Store relative path in the database
+                    "order" => ++$index,
+                ]);
+            }
+        }
+
+
 
         return response()->json([
             'message' => 'Product created successfully',
@@ -101,6 +74,37 @@ class ProductController extends Controller
         ], 201);
     }
 
+    public function all(Request $request)
+    {
+        $page = (int) request()->query("p") ?: 1;
+        $limit = (int) request()->query("l") ?: 100;
+
+        $filter = $request->filter;
+
+        $products = Product::with("translations")->skip(($page - 1) * $limit)->take($limit)->get();
+
+        return response()->json(["message" => "OK", "data" => $products]);
+    }
+
+    public function uploadImage()
+    {
+        $file = request()->file("file");
+        $newFilename = time() . "_" . rand(11111, 99999) . "." . $file->getClientOriginalExtension();
+        $file->storeAs("public/products", $file->getClientOriginalName());
+        return response()->json(["message" => "OK", "data" => $file->getClientOriginalName()]);
+    }
+
+    public function arrangeImages()
+    {
+        $images = request()->images;
+        foreach ($images as $image) {
+            $image = ProductImage::find($image["id"]);
+            $image->update(["order" => $image["order"]]);
+        }
+        return response()->json(["message" => "OK", "data" => $images]);
+    }
+
+  
 
     public function details()
     {

@@ -4,6 +4,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CategorySpecsController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PrivilegeController;
@@ -64,6 +65,13 @@ Route::post("admin/status", [AdminAuthController::class, 'status'])->name('admin
 
 
 Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissionMiddleware::class])->group(function () {
+
+
+    Route::get("/category-specs", [CategorySpecsController::class, 'all'])->name('categorySpecs.all');
+    Route::get("/category-specs/{categoryId}", [CategorySpecsController::class, 'one'])->name('categorySpecs.one');
+    Route::post("/category-specs", [CategorySpecsController::class, 'add'])->name('categorySpecs.add');
+    Route::put("/category-specs/{id}", [CategorySpecsController::class, 'edit'])->name('categorySpecs.edit');
+    Route::delete("/category-specs/{id}", [CategorySpecsController::class, 'delete'])->name('categorySpecs.delete');
 
 
     Route::get('/languages', [LanguageController::class, 'all'])->name('languages.all');

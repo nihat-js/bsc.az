@@ -15,17 +15,17 @@ class Product extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'is_visible',
-        'add_basket',
-        'discount_price',
-        'price',
-        'file',
+        "category_id",
+        "price",
+        "slug",
+        "is_visible",
+        "cover_image",
     ];
 
     protected $casts = [
-        'is_visible' => 'boolean', // Cast 'is_visible' to a boolean
-        'add_basket' => 'boolean', // Cast 'add_basket' to a boolean
-        'discount_price' => 'double', // Cast 'discount_price' to a double
+        // 'is_visible' => 'boolean', // Cast 'is_visible' to a boolean
+        // 'add_basket' => 'boolean', // Cast 'add_basket' to a boolean
+        // 'discount_price' => 'double', // Cast 'discount_price' to a double
         'price' => 'double', // Cast 'price' to a double
     ];
 
@@ -38,7 +38,13 @@ class Product extends Model
         return $this->belongsTo(Category::class); // Assuming you have a Category model
     }
 
-    public function translations(){
+    public function translations()
+    {
         return $this->hasMany(ProductTranslation::class);
+    }
+
+    public function specs()
+    {
+        return $this->hasMany(ProductSpec::class);
     }
 }
