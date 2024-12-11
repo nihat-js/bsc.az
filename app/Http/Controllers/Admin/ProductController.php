@@ -30,8 +30,8 @@ class ProductController extends Controller
             "is_visible" => "sometimes|boolean",
             "weight" => "nullable|string",
             "dimension" => "nullable|string",
-            "country_id" => "nullable|integer",
-            "brand_id" => "nullable|integer",
+            "country_id" => "nullable|integer|exists:countries,id",
+            "brand_id" => "nullable|integer|exists:brands,id",
 
             'translations' => 'sometimes|array',
             'translations.*.lang_code' => 'required|string|exists:languages,code', // Validate lang_id
