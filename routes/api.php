@@ -70,7 +70,9 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
 
 
     Route::get("/category-specs", [CategorySpecsController::class, 'all'])->name('categorySpecs.all');
-    Route::get("/category-specs/{categoryId}", [CategorySpecsController::class, 'one'])->name('categorySpecs.one');
+    Route::get("/category-specs/{categoryId}", [CategorySpecsController::class, 'one'])->name('categorySpecs.one')
+    ->where('categoryId', '[0-9]+');
+    Route::get("/category-specs/category/{categoryId}", [CategorySpecsController::class, 'getByCategory'])->name('categorySpecs.getByCategory');
     Route::post("/category-specs", [CategorySpecsController::class, 'add'])->name('categorySpecs.add');
     Route::put("/category-specs/{id}", [CategorySpecsController::class, 'edit'])->name('categorySpecs.edit');
     Route::delete("/category-specs/{id}", [CategorySpecsController::class, 'delete'])->name('categorySpecs.delete');

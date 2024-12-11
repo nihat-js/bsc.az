@@ -37,7 +37,7 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'parent_id' => 'nullable|exists:categories,id',
             'is_visible' => 'boolean',
-            "name" => "required|string",
+            "name" => "required|string|unique:categories,name",
             // "slug" => "required|string|unique:categories,slug",// avtomatik
             'translations' => 'nullable|array',
             'translations.*.lang_code' => 'required|exists:languages,code',

@@ -70,19 +70,29 @@ class CategorySpecsController extends Controller
         ]);
     }
 
-    public function one($categoryId)
+    public function one($id)
     {
-        $categorySpecs = CategorySpecs::find($categoryId)
+        $categorySpecs = CategorySpecs::find($id)
             ->leftJoin("categories", "category_specs.category_id", "=", "categories.id")
             ->select("category_specs.*", "categories.name as category_name", "categories.slug as category_slug")
             ->first();
 
         $categorySpecs = $categorySpecs->toArray();
-        $translations = Translation::where("table_name", "category_specs")->where("table_id", $categoryId)->get();
+        $translations = Translation::where("table_name", "category_specs")->where("table_id", $id)->get();
 
 
         $categorySpecs["translations"] = $translations;
 
+
+        return response()->json([
+            "status" => "ok",
+            "data" => $categorySpecs
+        ]);
+    }
+
+    public function getByCategory($id)
+    {
+        $categorySpecs = CategorySpecs::where("category_id", $id)->get();
 
         return response()->json([
             "status" => "ok",
