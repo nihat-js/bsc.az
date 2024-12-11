@@ -3,13 +3,14 @@
 
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CategorySpecsController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PrivilegeController;
 use App\Http\Controllers\admin\RoleController;
-use App\Http\Controllers\CategoryFilterController;
+use App\Http\Controllers\FilterController;
 use App\Http\Middleware\AdminPermissionMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -160,6 +161,14 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::delete("/admins", [AdminController::class, 'bulkDelete'])->name('admins.bulkDelete');
 
 
+    // Route::get("/filter/{categoryId}",[FilterController::class, 'all'])->name('filter.all');
+
+
+    Route::get("/brands", [BrandController::class, 'all'])->name('brands.all');
+    Route::get("/brands/{id}", [BrandController::class, 'one'])->name('brands.one');
+    Route::post("/brands", [BrandController::class, 'add'])->name('brands.add');
+    Route::put("/brands/{id}", [BrandController::class, 'edit'])->name('brands.edit');
+    Route::delete("/brands/{id}", [BrandController::class, 'delete'])->name('brands.delete');
 
 
 
