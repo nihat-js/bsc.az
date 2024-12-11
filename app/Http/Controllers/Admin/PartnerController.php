@@ -81,6 +81,8 @@ class PartnerController extends Controller
             // 'logo' => 'nullable|file|mimes:jpeg,png,jpg,|max:10240',
             'logo' => 'nullable|string',
         ]);
+        $partner = Partner::findOrFail($id);
+
 
         if ($request->has('logo')) {
             $logo = $request->input('logo'); 
@@ -105,7 +107,7 @@ class PartnerController extends Controller
     
             $uploadPath = 'uploads/partners';  
 
-            Storage::disk("public")->delete($uploadPath . '/' . $fileName);
+            Storage::disk("public")->delete($uploadPath . '/' . $partner->logo);
             $path = Storage::disk("public")->put($uploadPath . '/' . $fileName, $imageData);
     
             if (!$path) {
@@ -115,7 +117,6 @@ class PartnerController extends Controller
             $validated['logo'] = $fileName;
         }
 
-        $partner = Partner::findOrFail($id);
 
 
         DB::beginTransaction();
