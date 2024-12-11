@@ -12,10 +12,11 @@ use Str;
 class ProductController extends Controller
 {
 
-    public function one(){
+    public function one()
+    {
         $product = Product::with("translations")
-        ->with("specs")
-        ->findOrFail(request()->id);
+            ->with("specs")
+            ->findOrFail(request()->id);
         return response()->json(["message" => "ok", "data" => $product]);
     }
     public function add(Request $request)
@@ -29,6 +30,8 @@ class ProductController extends Controller
             "is_visible" => "sometimes|boolean",
             "weight" => "nullable|string",
             "dimension" => "nullable|string",
+            "country_id" => "nullable|integer",
+            "brand_id" => "nullable|integer",
 
             'translations' => 'sometimes|array',
             'translations.*.lang_code' => 'required|string|exists:languages,code', // Validate lang_id
@@ -42,10 +45,10 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         $validated["slug"] = Str::slug($validated['name']);
-        
+
         // return response()->json($validated);
         $product = Product::create($validated);
-        if (@$validated["translations"]){
+        if (@$validated["translations"]) {
             foreach ($validated['translations'] as $translation) {
                 $translation["slug"] = Str::slug($translation['name']);
                 $product->translations()->create($translation);
@@ -92,8 +95,8 @@ class ProductController extends Controller
         $filter = $request->filter;
 
         $products = Product::with("translations")
-        ->with("specs")
-        ->skip(($page - 1) * $limit)->take($limit)->get();
+            ->with("specs")
+            ->skip(($page - 1) * $limit)->take($limit)->get();
 
         return response()->json(["message" => "OK", "data" => $products]);
     }
@@ -116,7 +119,7 @@ class ProductController extends Controller
         return response()->json(["message" => "OK", "data" => $images]);
     }
 
-  
+
 
     public function details()
     {
@@ -133,40 +136,69 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
         }
-
-        // Validate the request
+        DB::beginTransaction();
         $validated = $request->validate([
-            'is_visible' => 'sometimes|boolean',
-            'add_basket' => 'sometimes|boolean',
-            'discount_price' => 'nullable|numeric|min:0',
-            'price' => 'nullable|numeric|min:0',
-            'file' => 'nullable|string',
+            "category_id" => "sometimes|integer|exists:categories,id",
+            "name" => "sometimes|string|max:255",
+            "description" => "nullable|string",
+            'price' => 'sometimes|numeric|min:0',
+            "discount_price" => "nullable|numeric|min:0",
+            "is_visible" => "sometimes|boolean",
+            "weight" => "nullable|string",
+            "dimension" => "nullable|string",
+            "country_id" => "nullable|integer",
+            "brand_id" => "nullable|integer",
+
             'translations' => 'sometimes|array',
-            // 'translations.*.id' => 'nullable|integer|exists:product_translates,id',
+            'translations.*.lang_code' => 'required|string|exists:languages,code', // Validate lang_id
+            'translations.*.name' => 'required|string|max:255',
+            "translations.*.slug" => "required|string",
+            'translations.*.description' => 'nullable|string',
+
+            "images" => "nullable|array",
+            "specs" => "nullable|array",
+            "specs.*.spec_id" => "required|integer|exists:specs,id",
+            "specs.*.text" => "required|string",
+            // "images.*." => "string",
         ]);
+
         // dd($validated);
 
-        $product->update([
-            'is_visible' => $validated['is_visible'] ?? $product->is_visible,
-            'add_basket' => $validated['add_basket'] ?? $product->add_basket,
-            'discount_price' => $validated['discount_price'] ?? $product->discount_price,
-            'price' => $validated['price'] ?? $product->price,
-            'file' => $validated['file'] ?? $product->file,
-        ]);
+        $product->update($validated);
 
-        if ($validated['translations']) {
-            foreach ($validated['translations'] as $translationData) {
-                if (isset($translationData['lang_id'])) {
-                    $translation = $product->translations()->where("lang_id", "=", $translationData['lang_id'])->first();
-                    if ($translation) {
-                        $translation->update($translationData);
-                    } else {
-                        // dd($translationData);
-                        $product->translations()->create($translationData);
-                    }
-                }
+
+        if (@$validated['translations']) {
+            foreach ($validated['translations'] as $translation) {
+                // if (!$translation->slug){
+                //     $translation->slug = Str::slug($translation['name']);
+                // }
+                $product->translations()->updateOrCreate(
+                    ["lang_code" => $translation["lang_code"]],
+                    $translation
+                );
+                //     if (isset($translationData['lang_id'])) {
+                //         $translation = $product->translations()->where("lang_id", "=", $translationData['lang_id'])->first();
+                //         if ($translation) {
+                //             $translation->update($translationData);
+                //         } else {
+                //             // dd($translationData);
+                //             $product->translations()->create($translationData);
+                //         }
+                //     }
+                // }
             }
         }
+
+        if (@$validated["specs"]) {
+            foreach ($validated["specs"] as $spec) {
+                $product->specs()->updateOrCreate(
+                    ["spec_id" => $spec["spec_id"]],
+                    $spec
+                );
+            }
+        }
+
+        DB::commit();
         return response()->json([
             'message' => 'Product updated successfully',
             // 'data' => $product->load('translations'),
