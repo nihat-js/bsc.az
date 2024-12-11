@@ -4,52 +4,134 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Partner;
+use DB;
 use Illuminate\Http\Request;
+use Storage;
 
 class PartnerController extends Controller
 {
+
+    public function add(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string',
+            // 'logo' => 'nullable|file|mimes:jpeg,png,jpg,|max:10240',
+            'is_visible' => 'nullable|boolean',
+        ]);
+
+        if ($request->has('logo')) {
+            $logo = $request->input('logo'); 
+
+            if (!preg_match('/^data:image\/(\w+);base64,/', $logo, $matches)) {
+                return response()->json(['error' => 'Invalid base64 image data'], 400);
+            }
+    
+            $imageData = substr($logo, strpos($logo, ',') + 1);
+            $mimeType = $matches[1]; 
+    
+            if (!in_array($mimeType, ['jpeg', 'jpg', 'png'])) {
+                return response()->json(['error' => 'Invalid image type. Only jpeg, png, and jpg are allowed.'], 400);
+            }
+    
+            $imageData = base64_decode($imageData);
+            if ($imageData === false) {
+                return response()->json(['error' => 'Invalid base64 image data'], 400);
+            }
+            $fileName = time() . '_' . uniqid() . '.' . $mimeType;
+    
+            $uploadPath = 'uploads/partners';  
+            $path = Storage::disk("public")->put($uploadPath . '/' . $fileName, $imageData);
+    
+            if (!$path) {
+                return response()->json(['error' => 'Failed to save image'], 500);
+            }
+    
+            $validated['logo'] = $fileName;
+        }
+
+
+        $partner = Partner::create($validated);
+
+        return response()->json([
+            "message" => "ok",
+            "data" => $partner
+        ], 201);
+
+
+    }
     public function all()
     {
         $partners = Partner::all();
 
-        return response()->json(["message" => "OK", "data" => $partners]);
+        return response()->json(["status" => "OK", "data" => $partners]);
     }
 
-    public function details(Partner $partner)
+    public function one($id)
     {
-        return response()->json(["message" => "OK", "data" => $partner]);
+        $partner = Partner::findOrFail($id);
+        return response()->json(["status" => "ok", "data" => $partner]);
     }
 
-    public function add(Request $request)
+
+    public function edit(Request $request, $id)
     {
-        $request->validate([
-            'is_visible' => 'required|boolean',
-            'logo' => 'required|string',
-            'file' => 'required|file|mimes:jpeg,png,jpg,|max:10240',
+        $validated = $request->validate([
+            'name' => 'nullable|string',
+            'is_visible' => 'nullable|boolean',
+            // 'logo' => 'nullable|file|mimes:jpeg,png,jpg,|max:10240',
+            'logo' => 'nullable|string',
         ]);
 
-        $partner = Partner::create($request->all());
+        if ($request->has('logo')) {
+            $logo = $request->input('logo'); 
 
-        return response()->json(["message" => "OK", "data" => $partner], 201); 
+            if (!preg_match('/^data:image\/(\w+);base64,/', $logo, $matches)) {
+                return response()->json(['error' => 'Invalid base64 image data'], 400);
+            }
+            // return response()->json(['error' => 'Invalid base64 image data'], 400);
+    
+            $imageData = substr($logo, strpos($logo, ',') + 1);
+            $mimeType = $matches[1]; 
+    
+            if (!in_array($mimeType, ['jpeg', 'jpg', 'png'])) {
+                return response()->json(['error' => 'Invalid image type. Only jpeg, png, and jpg are allowed.'], 400);
+            }
+    
+            $imageData = base64_decode($imageData);
+            if ($imageData === false) {
+                return response()->json(['error' => 'Invalid base64 image data'], 400);
+            }
+            $fileName = time() . '_' . uniqid() . '.' . $mimeType;
+    
+            $uploadPath = 'uploads/partners';  
+
+            Storage::disk("public")->delete($uploadPath . '/' . $fileName);
+            $path = Storage::disk("public")->put($uploadPath . '/' . $fileName, $imageData);
+    
+            if (!$path) {
+                return response()->json(['error' => 'Failed to save image'], 500);
+            }
+    
+            $validated['logo'] = $fileName;
+        }
+
+        $partner = Partner::findOrFail($id);
+
+
+        DB::beginTransaction();
+        $partner->update($validated);
+        DB::commit();
+
+        return response()->json(["status" => "ok", "data" => $partner]);
     }
 
-    public function edit(Request $request, Partner $partner)
+    public function delete($id)
     {
-        $request->validate([
-            'is_visible' => 'required|boolean',
-            'logo' => 'required|string',
-            'file' => 'required|string',  // Assuming 'file' is a string or path
-        ]);
-
-        $partner->update($request->all());
-
-        return response()->json($partner);
-    }
-
-    public function delete(Partner $partner)
-    {
+        $partner = Partner::findOrFail($id);
         $partner->delete();
-
-        return response()->json(['message' => 'Partner deleted successfully.']);
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Partner deleted successfully.'
+        ]);
     }
 }
