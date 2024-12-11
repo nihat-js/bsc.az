@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CategorySpecsController;
+use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PrivilegeController;
@@ -169,6 +170,13 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::post("/brands", [BrandController::class, 'add'])->name('brands.add');
     Route::put("/brands/{id}", [BrandController::class, 'edit'])->name('brands.edit');
     Route::delete("/brands/{id}", [BrandController::class, 'delete'])->name('brands.delete');
+
+    Route::get("/countries", [CountryController::class, 'all'])->name('countries.all');
+    Route::get("/countries/{id}", [CountryController::class, 'one'])->name('countries.one');
+    Route::post("/countries", [CountryController::class, 'add'])->name('countries.add');
+    Route::put("/countries/{id}", [CountryController::class, 'edit'])->name('countries.edit');
+    Route::delete("/countries/{id}", [CountryController::class, 'delete'])->name('countries.delete');
+
 
 
 
