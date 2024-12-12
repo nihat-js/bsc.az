@@ -135,8 +135,9 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
 
     Route::get('/news', [NewsController::class, 'all'])->name('news.all');
     Route::post('/news', [NewsController::class, 'add'])->name('news.add');
+    Route::get('/news/{id}', [NewsController::class, 'one'])->name('news.one')
+    ->where('id', '[0-9]+');
     Route::get('/news/slug/{slug}', [NewsController::class, 'getBySlug'])->name('news.getBySlug');
-    Route::get('/news/{id}', [NewsController::class, 'one'])->name('news.one');
     Route::put('/news/{id}', [NewsController::class, 'edit'])->name('news.edit');
     Route::delete('/news/{id}', [NewsController::class, 'delete'])->name('news.delete');
 

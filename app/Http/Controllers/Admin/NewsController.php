@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Models\NewsTranslate;
 use App\Models\NewsTranslation;
+use DB;
 use Illuminate\Http\Request;
+use Str;
 
 
 class NewsController extends Controller
@@ -24,31 +26,74 @@ class NewsController extends Controller
     public function add(Request $request)
     {
         $validated = $request->validate([
+            "name" => "required|string",
+            // "slug"  => avtomatik yaranacaq
+            "description" => "nullable|string",
+            'cover_image' => 'nullable|string',
             'is_visible' => 'required|boolean',
-            'image' => 'nullable|string',
 
             'translations' => 'nullable|array',
-            'translations.*.lang_id' => 'required|integer|exists:languages,id', // Validate lang_id
-            'translations.*.slug' => 'required|string|unique:product_translates,slug|max:255',
+            'translations.*.lang_code' => 'required|string|exists:languages,code', 
+            // 'translations.*.slug' => 'required|string|unique:product_translates,slug|max:255',
             'translations.*.name' => 'required|string|max:255',
             'translations.*.description' => 'nullable|string',
         ]);
 
-        $news = News::create([
-            'is_visible' => $validated['is_visible'],
-            'image' => $validated['image'],
-        ]);
+        $validated['slug'] = Str::slug($validated['name']);
+        DB::beginTransaction();
+        $news = News::create($validated);
 
-        if ($validated['translations']) {
+        if (@$validated['translations']) {
             foreach ($validated['translations'] as $translation) {
+                $translation["slug"] = Str::slug($translation['name']);
                 $news->translations()->create($translation);
             }
         }
 
+        DB::commit();
         return response()->json([
-            'message' => 'OK',
-            'data' => $news->load('translations'),
+            'status' => 'ok',
+            'data' => $news
         ], 201);
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $product = News::with('translations')->findOrFail($id);
+
+        $validated = $request->validate([
+            "name" => "sometimes|string",
+            "slug"  => "sometimes|string",
+            "description" => "nullable|string",
+            'cover_image' => 'nullable|string',
+            'is_visible' => 'sometimes|boolean',
+
+            'translations' => 'nullable|array',
+            'translations.*.lang_code' => 'sometimes|string|exists:languages,code', 
+            'translations.*.slug' => 'sometimes|string',
+            'translations.*.name' => 'sometimes|string|max:255',
+            'translations.*.description' => 'nullable|string',
+        ]);
+        // dd($validated);
+
+        DB::beginTransaction();
+        $product->update($validated);
+
+        if (@$validated["translations"]){
+            foreach ($validated["translations"] as $translation) {
+                $translation["slug"] = Str::slug($translation['name']);
+                $product->translations()->updateOrCreate(
+                    ['lang_code' => $translation['lang_code']],
+                    $translation
+                );
+            }
+        }
+        DB::commit();
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Product updated successfully',
+            // 'data' => $product->load('translations'),
+        ], 200);
     }
 
     public function getBySlug($slug)
@@ -60,66 +105,23 @@ class NewsController extends Controller
     }
 
 
-    public function details()
+    public function one()
     {
         $product = News::with("translations")->findOrFail(request()->id);
         return response()->json(["message" => "OK", "data" => $product]);
     }
 
 
-    public function edit(Request $request, $id)
+
+    public function delete($id)
     {
-        $product = News::with('translations')->findOrFail($id);
-
-
-        $validated = $request->validate([
-            'is_visible' => 'sometimes|boolean',
-            "image" => "nullable|string",
-
-            'translations' => 'sometimes|array',
-            // 'translations.*.id' => 'nullable|integer|exists:product_translates,id',
-        ]);
-        // dd($validated);
-
-        $product->update([
-            'is_visible' => $validated['is_visible'] ?? $product->is_visible,
-            'image' => $validated['image'] ?? $product->image,
-        ]);
-
-        if ($validated['translations']) {
-            foreach ($validated['translations'] as $translationData) {
-                if (isset($translationData['lang_id'])) {
-                    $translation = $product->translations()->where("lang_id", "=", $translationData['lang_id'])->first();
-                    if ($translation) {
-                        $translation->update($translationData);
-                    } else {
-                        // dd($translationData);
-                        $product->translations()->create($translationData);
-                    }
-                }
-            }
-        }
-        return response()->json([
-            'message' => 'Product updated successfully',
-            // 'data' => $product->load('translations'),
-        ], 200);
-    }
-
-
-
-    public function delete()
-    {
-        $product = News::with('translations')->findOrFail(request()->id);
-
-
-        foreach ($product->translations as $translation) {
-            $translation->delete();
-        }
-        $product->delete();
+        $news = News::with('translations')->findOrFail($id);
+        $news->translations()->delete();
+        $news->delete();
 
         return response()->json([
-            'message' => 'OK',
-            // 'data' => $product
+            'status' => 'OK',
+            'data' => $news
         ], 200);
     }
 

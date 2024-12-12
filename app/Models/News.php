@@ -8,20 +8,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class News extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'news';
     protected $primaryKey = 'id';
     protected $keyType = 'int';
     protected $fillable = [
+        "name",
+        "slug",
+        "description",
+        'cover_image',
         'is_visible',
-        'image',
     ];
     protected $casts = [
-        'is_visible' => 'boolean',  // Cast 'is_visible' to a boolean
+        'is_visible' => 'boolean',  
     ];
 
-    // protected $dates = ['deleted_at'];
 
     public $timestamps = true;
 
