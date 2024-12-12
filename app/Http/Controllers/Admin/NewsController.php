@@ -96,13 +96,13 @@ class NewsController extends Controller
         ], 200);
     }
 
-    public function getBySlug($slug)
-    {
-        $newsTranslate = NewsTranslation::where('slug', $slug)->first();
-        $news = News::with("translations")->findOrFail($newsTranslate->id);
+    // public function getBySlug($slug)
+    // {
+    //     $newsTranslate = NewsTranslation::where('slug', $slug)->first();
+    //     $news = News::with("translations")->findOrFail($newsTranslate->id);
 
-        return response()->json($news);
-    }
+    //     return response()->json($news);
+    // }
 
 
     public function one()
