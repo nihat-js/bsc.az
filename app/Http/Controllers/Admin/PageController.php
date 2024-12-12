@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use DB;
 use Illuminate\Http\Request;
+use Str;
 
 class PageController extends Controller
 {
@@ -22,84 +24,76 @@ class PageController extends Controller
         return response()->json(["message" => "OK", "data" => $page]);
     }
 
-    public function edit()
+    public function edit(Request $request, $id)
     {
-        $validated = request()->validate([
-            // "type" => "required|integer",
-            "is_main" => "required|boolean",
-            'is_visible' => 'required|boolean',
-            'image' => 'nullable|string',
+        $validated = $request->validate([
+            "name" => "nullable|string|",
+            "slug" => "nullable|string",
+            "text" => "nullable|string",
+            'image' => 'nullable|file',
+            "is_visible" => "nullable|boolean",
 
             'translations' => 'nullable|array',
-            // 'translations.*.lang_id' => 'required|integer|exists:languages,id', // Validate lang_id
-            // 'translations.*.slug' => 'required  |string|unique:page_translates,slug|max:255',
-        ]);
-        $page = Page::findOrFail(request()->id);
-
-        $page->update([
-            // 'type' => $validated['type'],
-            'is_main' => $validated['is_main'],
-            'is_visible' => $validated['is_visible'],
-            'image' => $validated['image'],
+            'translations.*.lang_code' => 'required|string|exists:languages,code',
+            'translations.*.name' => 'required|string',
+            'translations.*.text' => 'required|string',
+            // 'translations.*.slug' => 'required  |string|unique:page_translates,slug|max:255', //add eleyende avtomatik yaradilmasi
         ]);
 
-        if ($page['translations']) {
-            foreach ($page['translations'] as $translation) {
-                $translation->updateOrCreate(
-                    ['lang_id' => $translation['lang_id'],],
+        $page = Page::findOrFail($id);
+        DB::beginTransaction();
+        $page->update($validated);
+
+        if ($validated['translations']) {
+            foreach ($validated['translations'] as $translation) {
+                $translation['slug'] = Str::slug($translation['name']);
+                $page->translations()->updateOrCreate(
+                    ['lang_code' => $translation['lang_code'],],
                     [
                         'slug' => $translation['slug'],
                         'name' => $translation['name'],
-                        'description' => $translation['description'],
+                        'text' => $translation['text'],
                     ]
                 );
-
             }
         }
+        DB::commit();
 
 
-        return response()->json(["message" => "OK", "data" => $page]);
+        return response()->json(["message" => "OK", "data" => $page->with("translations")]);
     }
     public function add(Request $request)
     {
         $validated = $request->validate([
-            // "type" => "required|integer",
-            "is_main" => "required|boolean",
-            'is_visible' => 'required|boolean',
+            "name" => "required|string|unique:pages,name",
+            "text" => "required|string",
             'image' => 'nullable|file',
 
             'translations' => 'nullable|array',
-            // 'translations.*.lang_id' => 'required|integer|exists:languages,id', // Validate lang_id
-            // 'translations.*.slug' => 'required  |string|unique:page_translates,slug|max:255',
-        ]);
-        // dd($validated);
-
-
-        $page = Page::create([
-            // 'type' => $validated['type'],
-            'is_main' => $validated['is_main'],
-            'is_visible' => $validated['is_visible'],
-            'image' => $validated['image'],
+            'translations.*.lang_code' => 'required|string|exists:languages,code',
+            'translations.*.name' => 'required|string',
+            'translations.*.text' => 'required|string',
+            // 'translations.*.slug' => 'required  |string|unique:page_translates,slug|max:255', //add eleyende avtomatik yaradilmasi
         ]);
 
 
-        if ($validated['translations']) {
+        DB::beginTransaction();
+
+        $validated["slug"] = Str::slug($validated["name"]);
+        $page = Page::create($validated);
+
+        if (@$validated['translations']) {
             foreach ($validated['translations'] as $translation) {
-                $page->translations()->create(
-                    [
-                        'lang_id' => $translation['lang_id'],
-                        'slug' => $translation['slug'],
-                        'name' => $translation['name'],
-                        'description' => $translation['description'],
-                    ]
-                );
+                $translation['slug'] = Str::slug($translation['name']);
+                $page->translations()->create($translation);
             }
         }
+        // if ($validated["file"]) {
+        //     $file = $validated["file"];
+        //     $file->storeAs("public/pages", $page->id . "." . $file->extension());
+        // }
 
-        if ($validated["file"]) {
-            $file = $validated["file"];
-            $file->storeAs("public/pages", $page->id . "." . $file->extension());
-        }
+        DB::commit();
 
 
         return response()->json([
@@ -112,20 +106,14 @@ class PageController extends Controller
     {
         $pages = Page::with('translations')->findOrFail(request()->id);
 
-        if (!$pages) {
-            return response()->json(['message' => 'NOT_FOUND'], 404);
-        }
-
-        foreach ($pages->translations as $translation) {
-            $translation->delete();
-        }
+        $pages->translations()->delete();
         $pages->delete();
 
         return response()->json([
             'message' => 'OK',
-            // 'data' => $pages
+            'data' => $pages
         ], 200);
-        
+
     }
 }
 

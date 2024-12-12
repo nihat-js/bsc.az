@@ -15,8 +15,10 @@ class Page extends Model
     protected $primaryKey = 'id';
     protected $keyType = 'int';
     protected $fillable = [
-        'type',
-        'is_main',
+        "name",
+        "slug",
+        "title",
+        "text",
         'is_visible',
         'image',
     ];
@@ -30,6 +32,6 @@ class Page extends Model
 
     public function translations()
     {
-        return $this->hasMany(PageTranslation::class);
+        return $this->hasMany(PageTranslation ::class);
     }
 }

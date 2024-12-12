@@ -126,11 +126,7 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::delete('/pages/{id}', [PageController::class, 'delete'])->name('pages.delete');
 
 
-    // Route::get('/pages', [PageController::class, 'all'])->name('pages.all');
-    // Route::get('/pages/{id}', [PageController::class, 'one'])->name('pages.one');
-    // Route::post('/pages', [PageController::class, 'add'])->name('pages.add');
-    // Route::put('/pages/{id}', [PageController::class, 'edit'])->name('pages.edit');
-    // Route::delete('/pages/{id}', [PageController::class, 'delete'])->name('pages.delete');
+
 
 
     Route::get('/news', [NewsController::class, 'all'])->name('news.all');
