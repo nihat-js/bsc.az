@@ -23,12 +23,21 @@ class FilterController extends Controller
         $maxPrice = Product::where('category_id', $categoryId)->max('price'); // Max price for a specific category
 
 
+
         $specs = CategorySpecs::where('category_id', $categoryId)
             ->where("show_in_filter", 1)
+            ->with("options")
             ->get();
 
+            return response()->json([
+                'specs' => $specs,
+                'minPrice' => $minPrice,
+                'maxPrice' => $maxPrice,
+            ]);
+
+
         foreach($specs as $spec){
-            $spec["options"] = Product::with("translations")-where("category_id",)
+            // $spec["options"] = Product::with("translations")-where("category_id",);
 
         }
 

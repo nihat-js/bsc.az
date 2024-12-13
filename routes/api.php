@@ -235,7 +235,7 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
 
 
 
-    // Route::get("/filter/{categoryId}", [FilterController::class, 'all'])->name('filter.all');
+    Route::get("/filter/category/id/{categoryId}", [FilterController::class, 'all'])->name('filter.all');
 
 
 });
