@@ -53,7 +53,9 @@ class CategorySpecsController extends Controller
 
     public function all()
     {
-        $categorySpecs = CategorySpecs::with("category.translations")->get();
+
+        $categorySpecs = CategorySpecs::with("options")
+            ->with("category.translations")->get();
 
         foreach ($categorySpecs as $categorySpec) {
             $translations = [];

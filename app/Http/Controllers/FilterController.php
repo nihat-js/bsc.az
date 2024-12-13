@@ -6,6 +6,7 @@ use App\Models\CategoryFilter;
 use App\Models\CategoryFilterOptions;
 use App\Models\CategorySpecs;
 use App\Models\Product;
+use App\Models\ProductSpec;
 use Illuminate\Http\Request;
 
 class FilterController extends Controller
@@ -22,9 +23,14 @@ class FilterController extends Controller
         $maxPrice = Product::where('category_id', $categoryId)->max('price'); // Max price for a specific category
 
 
-        $filters = CategorySpecs::where('category_id', $categoryId)
+        $specs = CategorySpecs::where('category_id', $categoryId)
             ->where("show_in_filter", 1)
             ->get();
+
+        foreach($specs as $spec){
+            $spec["options"] = Product::with("translations")-where("category_id",)
+
+        }
 
         return response()->json([
             'filters' => $filters,
