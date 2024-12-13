@@ -6,11 +6,13 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CategorySpecsController;
+use App\Http\Controllers\Admin\ColorCatalogController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DictionaryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PrivilegeController;
+use App\Http\Controllers\Admin\ProductColorOptionController;
 use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\CategorySpecOptionController;
 use App\Http\Controllers\FilterController;
@@ -214,24 +216,32 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::delete("/partners/{id}", [PartnerController::class, 'delete'])->name('partners.delete');
 
 
-    Route::get("/dictionary/{id}", [DictionaryController::class, 'one'])->name('dictionary.one')
+    $controller = DictionaryController::class;
+    Route::get("/dictionary/{id}", [$controller, 'one'])->name('dictionary.one')
         ->where('id', '[0-9]+');
-    Route::post("/dictionary", [DictionaryController::class, 'add'])->name('dictionary.add');
-    Route::put("/dictionary/{id}", [DictionaryController::class, 'edit'])->name('dictionary.edit');
-    Route::delete("/dictionary/{id}", [DictionaryController::class, 'delete'])->name('dictionary.delete');
-    Route::get("/dictionary/language/{lang_code}", [DictionaryController::class, 'byLanguage'])
+    Route::post("/dictionary", [$controller, 'add'])->name('dictionary.add');
+    Route::put("/dictionary/{id}", [$controller, 'edit'])->name('dictionary.edit');
+    Route::delete("/dictionary/{id}", [$controller, 'delete'])->name('dictionary.delete');
+    Route::get("/dictionary/language/{lang_code}", [$controller, 'byLanguage'])
         ->name('dictionary.allLanguage');
 
 
-    // Route::get("/category-spec-option")
-    Route::post("/category-spec-options", [CategorySpecOptionController::class, 'add'])->name('categorySpecOptions.add');
-    Route::post("/category-spec-options/bulk", [CategorySpecOptionController::class, 'bulkAdd'])->name('categorySpecOptions.bulkAdd');
-
-    Route::get("/category-spec-options", [CategorySpecOptionController::class, 'all'])->name('categorySpecOptions.all');
-    Route::delete("/category-spec-options/{id}", [CategorySpecOptionController::class, 'delete'])->name('categorySpecOptions.delete');
+    $controller = CategorySpecOptionController::class;
+    Route::post("/category-spec-options", [$controller, 'add'])->name('categorySpecOptions.add');
+    Route::post("/category-spec-options/bulk", [$controller, 'bulkAdd'])->name('categorySpecOptions.bulkAdd');
+    Route::get("/category-spec-options", [$controller, 'all'])->name('categorySpecOptions.all');
+    Route::delete("/category-spec-options/{id}", [$controller, 'delete'])->name('categorySpecOptions.delete');
 
     // Route::get("/category-spec-options/category/{categoryId}", [CategorySpecOptionController::class, 'categoryOptions'])->name('categorySpecs.categoryOptions');    
-    
+
+
+    $controller = ColorCatalogController::class;
+    Route::get("/color-catalog", [$controller, 'all'])->name('productColorOptions.all');
+    Route::get("/color-catalog/{id}", [$controller, 'one'])->name('productColorOptions.one');
+    Route::post("/color-catalog", [$controller, 'add'])->name('productColorOptions.add');
+    Route::put("/color-catalog/{id}", [$controller, 'edit'])->name('productColorOptions.edit');
+    Route::delete("/color-catalog/{id}", [$controller, 'delete'])->name('productColorOptions.delete');
+
 
 
 
