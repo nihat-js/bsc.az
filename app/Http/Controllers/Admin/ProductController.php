@@ -32,6 +32,8 @@ class ProductController extends Controller
             "dimension" => "nullable|string",
             "country_id" => "nullable|integer|exists:countries,id",
             "brand_id" => "nullable|integer|exists:brands,id",
+            "colors" => "nullable|array",
+            "colors.*" => "integer|exists:color_catalog,id",
 
             'translations' => 'sometimes|array',
             'translations.*.lang_code' => 'required|string|exists:languages,code', // Validate lang_id
@@ -59,6 +61,12 @@ class ProductController extends Controller
             foreach ($validated["specs"] as $spec) {
                 $product->specs()->create($spec);
             }
+        }
+        if (@$validated["colors"]){
+            $array = collect($validated["colors"])->map(function($color){
+                return ["color_id" => $color];
+            });
+            $product->colors()->createMany($array);
         }
 
 
