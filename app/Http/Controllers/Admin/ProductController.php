@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Services\ImageUploadService;
 use DB;
 use Illuminate\Http\Request;
 use Str;
@@ -70,7 +71,13 @@ class ProductController extends Controller
         }
 
 
-        // if (@$validated["images"]) {
+        if (@$validated["images"]) {
+
+            $filenames = "";
+            foreach ($validated["images"] as $image){
+                ImageUploadService::uploadBase64Image($image, "products");
+            }
+
         //     foreach ($validated["images"] as $index => $image) {
         //         // Generate a random filename with timestamp
         //         $filename = time() . '_' . str_random(10) . '.' . $image->getClientOriginalExtension();
@@ -84,7 +91,7 @@ class ProductController extends Controller
         //             "order" => ++$index,
         //         ]);
         //     }
-        // }
+        }
 
 
         DB::commit();

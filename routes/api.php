@@ -130,9 +130,13 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::get('/categories', [CategoryController::class, 'all'])->name('categories.all');
     Route::get('/categories/getChild/{id}', [CategoryController::class, 'getChild'])->name('categories.getChild');
     Route::post('/categories', [CategoryController::class, 'add'])->name('categories.add');
-    Route::get('/categories/{key}', [CategoryController::class, 'one'])->name('categories.one');
-    Route::put('/categories/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
-    Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->name('categories.delete');
+    Route::get('/categories/{id}', [CategoryController::class, 'one'])->name('categories.one')
+    ->where('id', '[0-9]+');
+    Route::put('/categories/{id}', [CategoryController::class, 'edit'])->name('categories.edit')
+    ->where('id', '[0-9]+');
+    Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->name('categories.delete')
+    ->where('id', '[0-9]+');
+    Route::get("/categories/leaf", [CategoryController::class, 'leaf'])->name('categories.leaf');
 
 
 
