@@ -112,7 +112,10 @@ class CategorySpecsController extends Controller
 
     public function getByCategory($id)
     {
-        $categorySpecs = CategorySpecs::where("category_id", $id)->get();
+        $categorySpecs = CategorySpecs::where("category_id", $id)
+        ->with("translations")
+        ->with("options")
+        ->get();
 
         return response()->json([
             "status" => "ok",

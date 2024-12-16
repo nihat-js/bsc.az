@@ -8,6 +8,7 @@ use App\Models\ProductImage;
 use App\Services\ImageUploadService;
 use DB;
 use Illuminate\Http\Request;
+use Storage;
 use Str;
 
 class ProductController extends Controller
@@ -63,34 +64,39 @@ class ProductController extends Controller
                 $product->specs()->create($spec);
             }
         }
-        if (@$validated["colors"]){
-            $array = collect($validated["colors"])->map(function($color){
+        if (@$validated["colors"]) {
+            $array = collect($validated["colors"])->map(function ($color) {
                 return ["color_id" => $color];
             });
             $product->colors()->createMany($array);
         }
 
 
-        if (@$validated["images"]) {
 
-            $filenames = "";
-            foreach ($validated["images"] as $image){
+
+        if (@$validated["images"]) {
+            $folderName = uniqid('product_', true);  // A unique folder name for each product
+            $uploadPath = 'uploads/products/' . $folderName;
+            Storage::disk('public')->makeDirectory($uploadPath);
+
+            $filenames = [];
+            foreach ($validated["images"] as $image) {
                 ImageUploadService::uploadBase64Image($image, "products");
             }
 
-        //     foreach ($validated["images"] as $index => $image) {
-        //         // Generate a random filename with timestamp
-        //         $filename = time() . '_' . str_random(10) . '.' . $image->getClientOriginalExtension();
+            //     foreach ($validated["images"] as $index => $image) {
+            //         // Generate a random filename with timestamp
+            //         $filename = time() . '_' . str_random(10) . '.' . $image->getClientOriginalExtension();
 
-        //         // Store the image with the new filename
-        //         $image->storeAs("public/products", $filename);
+            //         // Store the image with the new filename
+            //         $image->storeAs("public/products", $filename);
 
-        //         // Save image details in the database
-        //         $product->images()->create([
-        //             "path" => "products/" . $filename, // Store relative path in the database
-        //             "order" => ++$index,
-        //         ]);
-        //     }
+            //         // Save image details in the database
+            //         $product->images()->create([
+            //             "path" => "products/" . $filename, // Store relative path in the database
+            //             "order" => ++$index,
+            //         ]);
+            //     }
         }
 
 
