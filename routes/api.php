@@ -136,7 +136,7 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     ->where('id', '[0-9]+');
     Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->name('categories.delete')
     ->where('id', '[0-9]+');
-    Route::get("/categories/leaf-categories", [CategoryController::class, 'leaf'])->name('categories.leaf');
+    Route::get("/categories/leafCategories", [CategoryController::class, 'leafCategories'])->name('categories.leafCategories');
 
 
 

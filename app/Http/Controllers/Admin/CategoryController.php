@@ -104,29 +104,16 @@ class CategoryController extends Controller
         return response()->json($category->load('translations'), 201);
     }
 
-    public function leaf()
+    public function leafCategories()
     {
-        // $categories = Category
 
-        // 
-        // 1 
-        // 2    
-        // 34
-        // select * from categories where id not in (select parent_id from categories where )
-        // $parents = Category::where("parent_id", null)->pluck("parent_id")
-        // ->pluck("parent_id")
-        // $leafCategories = Category::whereNotIn('id', function ($query) {
-        //     $query->select('parent_id')
-        //         ->from('categories')
-        //         ->whereNotNull('parent_id');
-        // });
 
         $leafCategories = Category::whereNotIn("id", function ($query) {
             $query->distinct()
                 ->select("parent_id")  // Select only the parent_id column
                 ->from("categories")
                 ->whereNotNull("parent_id");
-        })->get();
+        })->with("translations")->get();
 
         return response()->json(
             [
