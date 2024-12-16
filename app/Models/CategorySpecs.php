@@ -9,7 +9,7 @@ class CategorySpecs extends Model
 {
     protected $fillable = [
         'category_id',
-        'group_id',
+        'group_name',
         'name',
         'show_in_filter',
         'filter_type',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin\CategorySpecOption;
 use App\Models\CategorySpecs;
 use App\Models\Translation;
 use DB;
@@ -18,20 +19,20 @@ class CategorySpecsController extends Controller
         $request->validate([
             "category_id" => "required|exists:categories,id",
             "name" => "string|required", // default olaraq az dilde olmalidir diglerini translationla elave edeceyik
-            "group_id" => "nullable|integer", // qruplari da yaratmaq olar
+            "group_name" => "nullable|string", // qruplari da yaratmaq olar
             "show_in_filter" => "nullable|boolean",
+            "options" => "nullable|array",
+            "options.*.text" => "required|string",
+            "options.*.translations" => "nullable|array",
+            "options.*.translations.*.lang_code" => "required|string|exists:languages,code",
+            "options.*.translations.*.text" => "required|string",
             "translations" => "nullable|array",
             "translations.*.lang_code" => "required|string|exists:languages,code",
             "translations.*.text" => "required|string",
         ]);
 
 
-        $categorySpecs = CategorySpecs::create([
-            "category_id" => $request->category_id,
-            "name" => $request->name,
-            "group_id" => $request->group_id,
-            "show_in_filter" => $request->show_in_filter,
-        ]);
+        $categorySpecs = CategorySpecs::create($request->all());
 
         if ($request->translations) {
             foreach ($request->translations as $index => $translation) {
@@ -40,6 +41,21 @@ class CategorySpecsController extends Controller
                     "lang_code" => $translation["lang_code"],
                     "text" => $translation["text"],
                 ]);
+            }
+        }
+
+        if ($request->options) {
+            foreach ($request->options as $o) {
+                $categorySpecOption = CategorySpecOption::create([
+                    "category_spec_id" => $categorySpecs->id,
+                    "text" => $o["text"],
+                ]);
+                if (@$o["translations"]) {
+                    foreach ($o["translations"] as $translation) {
+                        $translation["table_name"] = "category_spec_options";
+                        $categorySpecOption->translations()->create($translation);
+                    }
+                }
             }
         }
 
