@@ -13,10 +13,11 @@ class CategorySpecs extends Model
         'name',
         'show_in_filter',
         'filter_type',
-        "auto_save_options" 
+        "auto_save_options"
     ];
 
-    public function casts(){
+    public function casts()
+    {
         return [
             'show_in_filter' => 'boolean'
         ];
@@ -29,9 +30,10 @@ class CategorySpecs extends Model
 
     public function translations()
     {
-        return $this->hasMany(Translation::class,"table_id")
+        return $this->hasMany(Translation::class, "table_id", "id")
             ->where("table_name", "category_specs")
-            ->where("table_id", $this->id);
+            // ->select("lang_code", "text")
+            ;
     }
 
     public function options()
