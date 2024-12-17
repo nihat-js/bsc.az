@@ -143,7 +143,7 @@ class ProductController extends Controller
                 foreach ($filenames as $index => $filename) {
                     $product->images()->create([
                         "path" => $filename,
-                        "index" => ++$index
+                        "rank" => ++$index
                     ]);
                 }
         }
