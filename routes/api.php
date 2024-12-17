@@ -221,11 +221,12 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::put("/countries/{id}", [CountryController::class, 'edit'])->name('countries.edit');
     Route::delete("/countries/{id}", [CountryController::class, 'delete'])->name('countries.delete');
 
-    Route::get("/partners", [PartnerController::class, 'all'])->name('partners.all');
-    Route::get("/partners/{id}", [PartnerController::class, 'one'])->name('partners.one');
-    Route::post("/partners", [PartnerController::class, 'add'])->name('partners.add');
-    Route::put("/partners/{id}", [PartnerController::class, 'edit'])->name('partners.edit');
-    Route::delete("/partners/{id}", [PartnerController::class, 'delete'])->name('partners.delete');
+    $controller = PartnerController::class;
+    Route::get("/partners", [$controller, 'all'])->name('partners.all');
+    Route::get("/partners/{id}", [$controller, 'one'])->name('partners.one');
+    Route::post("/partners", [$controller, 'add'])->name('partners.add');
+    Route::put("/partners/{id}", [$controller, 'edit'])->name('partners.edit');
+    Route::delete("/partners/{id}", [$controller, 'delete'])->name('partners.delete');
 
 
     $controller = DictionaryController::class;
