@@ -338,6 +338,8 @@ class ProductController extends Controller
         $product = Product::findOrFail($request->id);
         DB::beginTransaction();
         $product->translations()->delete();
+        $product->colors()->delete();
+        $product->images()->delete();
         $product->specs()->delete();
         $product->delete();
         // $product->images()->delete();
@@ -349,6 +351,46 @@ class ProductController extends Controller
             'message' => 'Product and its translations deleted successfully',
             // 'data' => $product
         ], 200);
+    }
+
+    public function search(Request $request)
+    {
+        $q = $request->q;
+        $products = Product::where('name', 'like', "%$q%")->get();
+        return response()->json(["message" => "OK", "data" => $products]);
+    }
+
+    public function getProductByCategory($categoryId)
+    {
+        $products = Product::where('category_id', $categoryId)->get();
+        return response()->json(["message" => "OK", "data" => $products]);
+    }
+
+    public function getProductByBrand($brandId)
+    {
+        $products = Product::where('brand_id', $brandId)->get();
+        return response()->json(["message" => "OK", "data" => $products]);
+    }
+
+    public function deleteCoverImage()
+    {
+        $product = Product::find(request()->id);
+
+        Storage::disk('public')->delete("products" . "/" . $product->cover_image);
+
+        $product->update(["cover_image" => null]);
+        return response()->json(["message" => "OK",]);
+    }
+
+    public function deleteImage($id, $imageId)
+    {
+        DB::beginTransaction();
+        $image = ProductImage::where("product_id", $id)
+            ->findOrFail($imageId);
+        Storage::disk('public')->delete("products" . "/" . $image->path);
+        $image->delete();
+        DB::commit();
+        return response()->json(["message" => "OK", "data" => $image]);
     }
 
 }

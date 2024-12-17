@@ -131,11 +131,11 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::get('/categories/getChild/{id}', [CategoryController::class, 'getChild'])->name('categories.getChild');
     Route::post('/categories', [CategoryController::class, 'add'])->name('categories.add');
     Route::get('/categories/{id}', [CategoryController::class, 'one'])->name('categories.one')
-    ->where('id', '[0-9]+');
+        ->where('id', '[0-9]+');
     Route::put('/categories/{id}', [CategoryController::class, 'edit'])->name('categories.edit')
-    ->where('id', '[0-9]+');
+        ->where('id', '[0-9]+');
     Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->name('categories.delete')
-    ->where('id', '[0-9]+');
+        ->where('id', '[0-9]+');
     Route::get("/categories/leafCategories", [CategoryController::class, 'leafCategories'])->name('categories.leafCategories');
 
 
@@ -156,12 +156,20 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
 
 
     Route::get('/products', [AdminProductController::class, 'all'])->name('products.all');
-    Route::get('/products/{id}', [AdminProductController::class, 'one'])->name('products.one');
+    Route::get('/products/{id}', [AdminProductController::class, 'one'])->name('products.one')
+        ->where('id', '[0-9]+');
     Route::post('/products', [AdminProductController::class, 'add'])->name('products.add');
-    Route::put('/products/{id}', [AdminProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{id}', [AdminProductController::class, 'edit'])->name('products.edit')
+        ->where('id', '[0-9]+');
     Route::delete('/products/{id}', [AdminProductController::class, 'delete'])->name('products.delete');
     Route::post("/products/uplodImage", [AdminProductController::class, 'uploadImage'])->name('products.uploadImage');
     Route::post("products/arrangeImages", [AdminProductController::class, 'arrangeImages'])->name('products.arrangeImages');
+
+    Route::delete("/products/{id}/deleteCoverImage", [AdminProductController::class, 'deleteCoverImage'])
+        ->name('products.deleteCoverImage');
+
+    Route::delete("/products/{id}/deleteImage/{imageId}", [AdminProductController::class, 'deleteImage'])
+        ->name('products.deleteImage');
 
 
 
