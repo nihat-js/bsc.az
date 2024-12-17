@@ -13,13 +13,18 @@ class DictionaryController extends Controller
         $validated = $request->validate([
             'word' => 'required|string|unique:dictionary,word',
             'meaning' => 'required|string',
-            "translations" => "nullable|array"
+            "translations" => "nullable|array",
+            "translations.*.lang_code" => "required|string|exists:languages,code",
+            "translations.*.text" => "required|string"
         ]);
 
         $dictionary = Dictionary::create($validated);
 
         if (@$request["translations"]) {
-            $dictionary->translations()->createMany($request["translations"]);
+            foreach($request["translations"] as $translation){
+                $translation["table_name"] = "dictionary";
+                $dictionary->translations()->create($translation);
+            }
         }
 
         return response()->json([

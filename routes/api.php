@@ -231,6 +231,7 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     $controller = DictionaryController::class;
     Route::get("/dictionary/{id}", [$controller, 'one'])->name('dictionary.one')
         ->where('id', '[0-9]+');
+    Route::get("/dictionary", [$controller, 'all'])->name('dictionary.all');
     Route::post("/dictionary", [$controller, 'add'])->name('dictionary.add');
     Route::put("/dictionary/{id}", [$controller, 'edit'])->name('dictionary.edit');
     Route::delete("/dictionary/{id}", [$controller, 'delete'])->name('dictionary.delete');
