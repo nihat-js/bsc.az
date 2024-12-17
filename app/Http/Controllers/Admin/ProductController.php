@@ -43,10 +43,12 @@ class ProductController extends Controller
                 ]);
             }
         }
+        $product = $product->toArray();
+        $product["specs"] = $arr;
 
 
 
-        return response()->json(["message" => "ok", "data" => $arr]);
+        return response()->json(["message" => "ok", "data" => $product]);
     }
     public function add(Request $request)
     {
@@ -160,13 +162,40 @@ class ProductController extends Controller
     public function all(Request $request)
     {
         $page = (int) request()->query("p") ?: 1;
-        $limit = (int) request()->query("l") ?: 100;
+        $limit = (int) request()->query("l") ?: 50;
 
-        $filter = $request->filter;
+        // $filter = $request->filter;/
 
         $products = Product::with("translations")
             ->with("specs")
             ->skip(($page - 1) * $limit)->take($limit)->get();
+
+        $arr = collect();
+
+        $products = $products->toArray();
+        foreach ($products as &$product) {
+            foreach ($product["specs"] as $spec) {
+                $t = $arr->first(function ($item) use ($spec) {
+                    return $item["spec_id"] == $spec["spec_id"];
+                });
+
+                if ($t) {
+                    $arr = $arr->map(function ($item) use ($spec, $t) {
+                        if ($item["spec_id"] == $t["spec_id"]) {
+                            $item["data"][] = $spec;  // Add the spec to the existing data
+                        }
+                        return $item;
+                    });
+                } else {
+                    $arr->push([
+                        "spec_id" => $spec["spec_id"],
+                        "data" => [$spec]
+                    ]);
+                }
+            }
+            // $product = $product->toArray();
+            $product["specs"] = $arr;
+        }
 
         return response()->json(["message" => "OK", "data" => $products]);
     }
