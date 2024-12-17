@@ -24,7 +24,7 @@ class ProductImage extends Model
         "path",
         "rank"
     ];
-    
+
 
     // The attributes that should be cast to native types
     protected $casts = [

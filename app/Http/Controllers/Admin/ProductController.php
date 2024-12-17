@@ -93,12 +93,12 @@ class ProductController extends Controller
         $uploadPath = 'uploads/products/' . $folderName;
         Storage::disk('public')->makeDirectory($uploadPath);
 
-        if (@$validated["cover_image"]){
+        if (@$validated["cover_image"]) {
             $coverImage = ImageUploadService::uploadBase64Image($validated["cover_image"], $uploadPath);
-            $validated["cover_image"] = $folderName . "/".$coverImage;
+            $validated["cover_image"] = $folderName . "/" . $coverImage;
             // $product->cover_image = $coverImage;
             // $product->save();
-        }  
+        }
 
         // return response()->json($validated);
         $product = Product::create($validated);
@@ -132,20 +132,20 @@ class ProductController extends Controller
             });
             $product->colors()->createMany($array);
         }
-       
+
 
         if (@$validated["images"]) {
-                $filenames = [];
-                foreach ($validated["images"] as $image) {
-                    $filename = ImageUploadService::uploadBase64Image($image, $uploadPath);
-                    $filenames[] = $folderName . "/" . $filename; 
-                }
-                foreach ($filenames as $index => $filename) {
-                    $product->images()->create([
-                        "path" => $filename,
-                        "rank" => ++$index
-                    ]);
-                }
+            $filenames = [];
+            foreach ($validated["images"] as $image) {
+                $filename = ImageUploadService::uploadBase64Image($image, $uploadPath);
+                $filenames[] = $folderName . "/" . $filename;
+            }
+            foreach ($filenames as $index => $filename) {
+                $product->images()->create([
+                    "path" => $filename,
+                    "rank" => ++$index
+                ]);
+            }
         }
 
 
@@ -219,11 +219,7 @@ class ProductController extends Controller
 
 
 
-    public function details()
-    {
-        $product = Product::with("translations")->find(request()->id);
-        return response()->json(["message" => "OK", "data" => $product]);
-    }
+
 
 
     public function edit(Request $request, $id)
@@ -244,20 +240,27 @@ class ProductController extends Controller
             "is_visible" => "sometimes|boolean",
             "weight" => "nullable|string",
             "dimension" => "nullable|string",
-            "country_id" => "nullable|integer",
-            "brand_id" => "nullable|integer",
+            "country_id" => "nullable|integer|exists:countries,id",
+            "brand_id" => "nullable|integer|exists:brands,id",
+            "colors" => "nullable|array",
+            "colors.*" => "integer|exists:color_catalog,id",
+            "cover_image" => "nullable|string",
+
+            "specs" => "nullable|array",
+            "specs.*.spec_id" => "required|integer|exists:category_specs,id",
+            "specs.*.data" => "required|array",
+            "specs.*.data.*.text" => "required|string",
+            "specs.*.data.*.option_id" => "nullable|integer|exists:category_spec_options,id",
+            "specs.*.data.*.translations" => "nullable|array",
+            "specs.*.data.*.translations.*.lang_code" => "required|string|exists:languages,code",
+            "specs.*.data.*.translations.*.text" => "required|string",
 
             'translations' => 'sometimes|array',
             'translations.*.lang_code' => 'required|string|exists:languages,code', // Validate lang_id
             'translations.*.name' => 'required|string|max:255',
-            "translations.*.slug" => "required|string",
             'translations.*.description' => 'nullable|string',
 
             "images" => "nullable|array",
-            "specs" => "nullable|array",
-            "specs.*.spec_id" => "required|integer|exists:specs,id",
-            "specs.*.text" => "required|string",
-            // "images.*." => "string",
         ]);
 
         // dd($validated);
@@ -274,24 +277,41 @@ class ProductController extends Controller
                     ["lang_code" => $translation["lang_code"]],
                     $translation
                 );
-                //     if (isset($translationData['lang_id'])) {
-                //         $translation = $product->translations()->where("lang_id", "=", $translationData['lang_id'])->first();
-                //         if ($translation) {
-                //             $translation->update($translationData);
-                //         } else {
-                //             // dd($translationData);
-                //             $product->translations()->create($translationData);
-                //         }
-                //     }
-                // }
             }
         }
 
         if (@$validated["specs"]) {
             foreach ($validated["specs"] as $spec) {
-                $product->specs()->updateOrCreate(
-                    ["spec_id" => $spec["spec_id"]],
-                    $spec
+                // return response()->json($spec);
+                $data = $spec["data"];
+                foreach ($data as $d) {
+                    $d["spec_id"] = $spec["spec_id"];
+                    $s = $product->specs()->updateOrCreate(
+                        ["spec_id" => $spec["spec_id"]],
+                        $d
+                    );
+                    if (@$d["translations"]) {
+                        foreach ($d["translations"] as $translation) {
+                            $translation["table_name"] = "product_specs";
+                            $s->translations()->updateOrCreate(
+                                ["lang_code" => $translation["lang_code"]],
+                                $translation
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        if (@$validated["colors"]) {
+            $c = collect($validated["colors"]);
+            $product->colors()->whereNotIn("color_id", $c)->delete();
+            foreach ($validated["colors"] as $color) {
+                $product->colors()->updateOrCreate(
+                    [
+                        "color_id" => $color
+                    ],
+                    ["color_id" => $color]
                 );
             }
         }
