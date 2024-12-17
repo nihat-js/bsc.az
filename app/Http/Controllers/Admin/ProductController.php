@@ -65,6 +65,7 @@ class ProductController extends Controller
             "brand_id" => "nullable|integer|exists:brands,id",
             "colors" => "nullable|array",
             "colors.*" => "integer|exists:color_catalog,id",
+            "cover_image" => "nullable|string",
 
             "specs" => "nullable|array",
             "specs.*.spec_id" => "required|integer|exists:category_specs,id",
@@ -88,6 +89,16 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         $validated["slug"] = Str::slug($validated['name']);
+        $folderName = uniqid('product_', true);  // A unique folder name for each product
+        $uploadPath = 'uploads/products/' . $folderName;
+        Storage::disk('public')->makeDirectory($uploadPath);
+
+        if (@$validated["cover_image"]){
+            $coverImage = ImageUploadService::uploadBase64Image($validated["cover_image"], $uploadPath);
+            $validated["cover_image"] = $folderName . "/".$coverImage;
+            // $product->cover_image = $coverImage;
+            // $product->save();
+        }  
 
         // return response()->json($validated);
         $product = Product::create($validated);
@@ -121,32 +132,20 @@ class ProductController extends Controller
             });
             $product->colors()->createMany($array);
         }
-
-
-
+       
 
         if (@$validated["images"]) {
-            //     $folderName = uniqid('product_', true);  // A unique folder name for each product
-            //     $uploadPath = 'uploads/products/' . $folderName;
-            //     Storage::disk('public')->makeDirectory($uploadPath);
-
-            //     $filenames = [];
-            //     foreach ($validated["images"] as $image) {
-            //         ImageUploadService::uploadBase64Image($image, "products");
-            //     }
-            //     foreach ($validated["images"] as $index => $image) {
-            //         // Generate a random filename with timestamp
-            //         $filename = time() . '_' . str_random(10) . '.' . $image->getClientOriginalExtension();
-
-            //         // Store the image with the new filename
-            //         $image->storeAs("public/products", $filename);
-
-            //         // Save image details in the database
-            //         $product->images()->create([
-            //             "path" => "products/" . $filename, // Store relative path in the database
-            //             "order" => ++$index,
-            //         ]);
-            //     }
+                $filenames = [];
+                foreach ($validated["images"] as $image) {
+                    $filename = ImageUploadService::uploadBase64Image($image, $uploadPath);
+                    $filenames[] = $folderName . "/" . $filename; 
+                }
+                foreach ($filenames as $index => $filename) {
+                    $product->images()->create([
+                        "path" => $filename,
+                        "index" => ++$index
+                    ]);
+                }
         }
 
 
