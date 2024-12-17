@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductSpec;
 use App\Services\ImageUploadService;
 use DB;
 use Illuminate\Http\Request;
@@ -14,12 +15,38 @@ use Str;
 class ProductController extends Controller
 {
 
-    public function one()
+    public function one($id)
     {
         $product = Product::with("translations")
             ->with("specs")
-            ->findOrFail(request()->id);
-        return response()->json(["message" => "ok", "data" => $product]);
+            ->findOrFail($id);
+
+        // Group the specs by `spec_id` and map each group
+        $arr = collect();
+
+        foreach ($product->specs as $spec) {
+            $t = $arr->first(function ($item) use ($spec) {
+                return $item["spec_id"] == $spec->spec_id;
+            });
+
+            if ($t) {
+                $arr = $arr->map(function ($item) use ($spec, $t) {
+                    if ($item["spec_id"] == $t["spec_id"]) {
+                        $item["data"][] = $spec;  // Add the spec to the existing data
+                    }
+                    return $item;
+                });
+            } else {
+                $arr->push([
+                    "spec_id" => $spec->spec_id,
+                    "data" => [$spec]
+                ]);
+            }
+        }
+
+
+
+        return response()->json(["message" => "ok", "data" => $arr]);
     }
     public function add(Request $request)
     {
