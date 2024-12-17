@@ -37,13 +37,23 @@ class ProductController extends Controller
             "colors" => "nullable|array",
             "colors.*" => "integer|exists:color_catalog,id",
 
+            "specs" => "nullable|array",
+            "specs.*.spec_id" => "required|integer|exists:category_specs,id",
+            "specs.*.data" => "required|array",
+            "specs.*.data.*.text" => "required|string",
+            "specs.*.data.*.option_id" => "nullable|integer|exists:category_spec_options,id",
+            "specs.*.data.*.translations" => "nullable|array",
+            "specs.*.data.*.translations.*.lang_code" => "required|string|exists:languages,code",
+            "specs.*.data.*.translations.*.text" => "required|string",
+
+
+
             'translations' => 'sometimes|array',
             'translations.*.lang_code' => 'required|string|exists:languages,code', // Validate lang_id
             'translations.*.name' => 'required|string|max:255',
             'translations.*.description' => 'nullable|string',
 
             "images" => "nullable|array",
-            "specs" => "nullable|array",
             // "images.*." => "string",
         ]);
 
@@ -61,9 +71,21 @@ class ProductController extends Controller
 
         if (@$validated["specs"]) {
             foreach ($validated["specs"] as $spec) {
-                $product->specs()->create($spec);
+                // return response()->json($spec);
+                $data = $spec["data"];
+                foreach ($data as $d) {
+                    $d["spec_id"] = $spec["spec_id"];
+                    $s = $product->specs()->create($d);
+                    if (@$d["translations"]) {
+                        foreach ($d["translations"] as $translation) {
+                            $translation["table_name"] = "product_specs";
+                            $s->translations()->create($translation);
+                        }
+                    }
+                }
             }
         }
+
         if (@$validated["colors"]) {
             $array = collect($validated["colors"])->map(function ($color) {
                 return ["color_id" => $color];
@@ -75,15 +97,14 @@ class ProductController extends Controller
 
 
         if (@$validated["images"]) {
-            $folderName = uniqid('product_', true);  // A unique folder name for each product
-            $uploadPath = 'uploads/products/' . $folderName;
-            Storage::disk('public')->makeDirectory($uploadPath);
+            //     $folderName = uniqid('product_', true);  // A unique folder name for each product
+            //     $uploadPath = 'uploads/products/' . $folderName;
+            //     Storage::disk('public')->makeDirectory($uploadPath);
 
-            $filenames = [];
-            foreach ($validated["images"] as $image) {
-                ImageUploadService::uploadBase64Image($image, "products");
-            }
-
+            //     $filenames = [];
+            //     foreach ($validated["images"] as $image) {
+            //         ImageUploadService::uploadBase64Image($image, "products");
+            //     }
             //     foreach ($validated["images"] as $index => $image) {
             //         // Generate a random filename with timestamp
             //         $filename = time() . '_' . str_random(10) . '.' . $image->getClientOriginalExtension();
@@ -107,6 +128,7 @@ class ProductController extends Controller
             // 'data' => $product->load('translations'), // Include translations in the response
         ], 201);
     }
+
 
     public function all(Request $request)
     {

@@ -1,0 +1,58 @@
+{
+  "name": "Samsung S23 FE", 
+  "description": "Melumata esasen yenilik ves", 
+  "colors": [
+      "Black", 
+      "White", 
+      "Green"
+  ],
+  "category_id": 373, 
+  "price": 1299.99,
+  "discount_price": 0,
+  "is_visible": true,
+  "country_id": 12, 
+  "brand_id": 4, 
+  "weight": "140g", 
+  "dimension": "5.5x1.3x2.3", 
+  "translations": [ 
+      {
+          "lang_code": "en",
+          "name": "Samsung S23 FE",
+          "description": "This is last year's model."
+      }
+  ],
+  "specs": [ 
+      {
+          "spec_id": 24, 
+          "options": [ 
+              {
+                  "option_id": 1, 
+                  "text": "QLED+ 9D Eyeglasses"
+              },
+              {
+                  "option_id": 2, 
+                  "text": "OLED+ 8K"
+              }
+          ],
+          "translations": [
+              {
+                  "lang_code": "en",
+                  "translations": [
+                      "QLED+ 9D Eyeglasses",
+                      "OLED+ 8K"
+                  ]
+              }
+          ]
+      },
+      {
+          "spec_id": 25, 
+          "options": [
+              {
+                  "option_id": 3, 
+                  "text": "128 GB"
+              }
+          ]
+      }
+  ],
+  "images": [] 
+}
