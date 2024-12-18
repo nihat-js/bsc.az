@@ -34,7 +34,7 @@ class Product extends Model
     ];
 
     public function getCoverImageAttribute($value){
-        return $value ? asset("storage/uploads/products") . $value : null;
+        return $value ? asset("storage/uploads/products/" . $value )  : null;
     }
 
     // Disable automatic timestamps since the table has created_at and updated_at

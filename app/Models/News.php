@@ -25,7 +25,7 @@ class News extends Model
     ];
 
     public function getCoverImageAttribute($value){
-        return $value ? asset("storage/uploads/news") . $value : null;
+        return $value ? asset("storage/uploads/news/". $value)  : null;
     }
 
 
