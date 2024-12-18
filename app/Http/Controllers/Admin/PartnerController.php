@@ -63,6 +63,10 @@ class PartnerController extends Controller
     {
         $partners = Partner::all();
 
+        $partners->map(function ($partner){
+            $partner->logo = asset('uploads/partners/' . $partner->logo);
+        });
+
         return response()->json(["status" => "OK", "data" => $partners]);
     }
 
