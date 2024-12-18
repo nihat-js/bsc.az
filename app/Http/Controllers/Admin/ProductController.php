@@ -19,6 +19,7 @@ class ProductController extends Controller
     {
         $product = Product::with("translations")
             ->with("specs")
+            ->with("images")
             ->findOrFail($id);
 
         // Group the specs by `spec_id` and map each group
@@ -167,6 +168,7 @@ class ProductController extends Controller
 
         $products = Product::with("translations")
             ->with("specs")
+            ->with("images")
             ->skip(($page - 1) * $limit)->take($limit)->get();
 
         $arr = collect();

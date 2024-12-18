@@ -27,7 +27,7 @@ class ProductImage extends Model
 
     public function getPathAttribute($value)
     {
-        return asset('storage/uploads' . $value);
+        return  $value ?  asset('storage/upload/products/' . $value) : null;
     }
 
 
