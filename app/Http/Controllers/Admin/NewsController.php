@@ -15,6 +15,7 @@ use Str;
 
 class NewsController extends Controller
 {
+    private $uploadPath = 'uploads/news/';
     public function all()
     {
         $page = (int) request()->query("p") ?: 1;
@@ -41,11 +42,10 @@ class NewsController extends Controller
             'translations.*.description' => 'nullable|string',
         ]);
 
-        $uploadPath = 'uploads/news/';
-        Storage::disk('public')->makeDirectory($uploadPath);
+        Storage::disk('public')->makeDirectory($this->uploadPath);
 
         if (@$validated["cover_image"]) {
-            $coverImage = ImageUploadService::uploadBase64Image($validated["cover_image"], $uploadPath);
+            $coverImage = ImageUploadService::uploadBase64Image($validated["cover_image"], $this->uploadPath);
             $validated["cover_image"] = $coverImage;
         }
         $validated['slug'] = Str::slug($validated['name']);
@@ -68,7 +68,7 @@ class NewsController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $product = News::with('translations')->findOrFail($id);
+        $news = News::with('translations')->findOrFail($id);
 
         $validated = $request->validate([
             "name" => "sometimes|string",
@@ -83,15 +83,23 @@ class NewsController extends Controller
             'translations.*.name' => 'sometimes|string|max:255',
             'translations.*.description' => 'nullable|string',
         ]);
+
+
+        if (@$validated["cover_image"]) {
+            Storage::disk('public')->makeDirectory($this->uploadPath);
+            Storage::disk("public")->delete( $this->uploadPath .  $news->getRawOriginal("cover_image"));
+            $coverImage = ImageUploadService::uploadBase64Image($validated["cover_image"], $this->uploadPath);
+            $validated["cover_image"] = $coverImage;
+        }
         // dd($validated);
 
         DB::beginTransaction();
-        $product->update($validated);
+        $news->update($validated);
 
         if (@$validated["translations"]){
             foreach ($validated["translations"] as $translation) {
                 $translation["slug"] = Str::slug($translation['name']);
-                $product->translations()->updateOrCreate(
+                $news->translations()->updateOrCreate(
                     ['lang_code' => $translation['lang_code']],
                     $translation
                 );
@@ -125,6 +133,11 @@ class NewsController extends Controller
     public function delete($id)
     {
         $news = News::with('translations')->findOrFail($id);
+
+        if ($news->cover_image){
+            Storage::disk("public")->delete($this->uploadPath . $news->getRawOriginal("cover_image"));
+        }
+
         $news->translations()->delete();
         $news->delete();
 
