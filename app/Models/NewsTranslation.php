@@ -20,7 +20,6 @@ class NewsTranslation extends Model
     ];
     protected $casts = [
         'news_id' => 'integer',
-        'lang_code' => 'integer',
     ];
     public $timestamps = true;
 }
