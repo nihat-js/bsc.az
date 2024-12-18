@@ -23,7 +23,7 @@ class Partner extends Model
     ];
 
     public function getLogoAttribute($value){
-        return $value ? asset("/storage/uploads/partners" . $value )  : null;
+        return $value ? asset("/storage/uploads/partners/" . $value )  : null;
     }
 
 }
