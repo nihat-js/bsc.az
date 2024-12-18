@@ -20,32 +20,32 @@ class PartnerController extends Controller
         ]);
 
         if ($request->has('logo')) {
-            $logo = $request->input('logo'); 
+            $logo = $request->input('logo');
 
             if (!preg_match('/^data:image\/(\w+);base64,/', $logo, $matches)) {
                 return response()->json(['error' => 'Invalid base64 image data'], 400);
             }
-    
+
             $imageData = substr($logo, strpos($logo, ',') + 1);
-            $mimeType = $matches[1]; 
-    
+            $mimeType = $matches[1];
+
             if (!in_array($mimeType, ['jpeg', 'jpg', 'png'])) {
                 return response()->json(['error' => 'Invalid image type. Only jpeg, png, and jpg are allowed.'], 400);
             }
-    
+
             $imageData = base64_decode($imageData);
             if ($imageData === false) {
                 return response()->json(['error' => 'Invalid base64 image data'], 400);
             }
             $fileName = time() . '_' . uniqid() . '.' . $mimeType;
-    
-            $uploadPath = 'uploads/partners';  
+
+            $uploadPath = 'uploads/partners';
             $path = Storage::disk("public")->put($uploadPath . '/' . $fileName, $imageData);
-    
+
             if (!$path) {
                 return response()->json(['error' => 'Failed to save image'], 500);
             }
-    
+
             $validated['logo'] = $fileName;
         }
 
@@ -63,9 +63,6 @@ class PartnerController extends Controller
     {
         $partners = Partner::all();
 
-        $partners->map(function ($partner){
-            $partner->logo = asset('uploads/partners/' . $partner->logo);
-        });
 
         return response()->json(["status" => "OK", "data" => $partners]);
     }
@@ -89,35 +86,35 @@ class PartnerController extends Controller
 
 
         if ($request->has('logo')) {
-            $logo = $request->input('logo'); 
+            $logo = $request->input('logo');
 
             if (!preg_match('/^data:image\/(\w+);base64,/', $logo, $matches)) {
                 return response()->json(['error' => 'Invalid base64 image data'], 400);
             }
             // return response()->json(['error' => 'Invalid base64 image data'], 400);
-    
+
             $imageData = substr($logo, strpos($logo, ',') + 1);
-            $mimeType = $matches[1]; 
-    
+            $mimeType = $matches[1];
+
             if (!in_array($mimeType, ['jpeg', 'jpg', 'png'])) {
                 return response()->json(['error' => 'Invalid image type. Only jpeg, png, and jpg are allowed.'], 400);
             }
-    
+
             $imageData = base64_decode($imageData);
             if ($imageData === false) {
                 return response()->json(['error' => 'Invalid base64 image data'], 400);
             }
             $fileName = time() . '_' . uniqid() . '.' . $mimeType;
-    
-            $uploadPath = 'uploads/partners';  
+
+            $uploadPath = 'uploads/partners';
 
             Storage::disk("public")->delete($uploadPath . '/' . $partner->logo);
             $path = Storage::disk("public")->put($uploadPath . '/' . $fileName, $imageData);
-    
+
             if (!$path) {
                 return response()->json(['error' => 'Failed to save image'], 500);
             }
-    
+
             $validated['logo'] = $fileName;
         }
 

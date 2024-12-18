@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Models\NewsTranslate;
 use App\Models\NewsTranslation;
+use App\Services\ImageUploadService;
 use DB;
 use Illuminate\Http\Request;
+use Storage;
 use Str;
 
 
@@ -18,9 +20,9 @@ class NewsController extends Controller
         $page = (int) request()->query("p") ?: 1;
         $limit = (int) request()->query("l") ?: 20;
 
-        $products = News::with("translations")->skip(($page - 1) * $limit)->take($limit)->get();
+        $news = News::with("translations")->skip(($page - 1) * $limit)->take($limit)->get();
 
-        return response()->json(["message" => "OK", "data" => $products]);
+        return response()->json(["message" => "OK", "data" => $news]);
     }
 
     public function add(Request $request)
@@ -39,6 +41,13 @@ class NewsController extends Controller
             'translations.*.description' => 'nullable|string',
         ]);
 
+        $uploadPath = 'uploads/news/';
+        Storage::disk('public')->makeDirectory($uploadPath);
+
+        if (@$validated["cover_image"]) {
+            $coverImage = ImageUploadService::uploadBase64Image($validated["cover_image"], $uploadPath);
+            $validated["cover_image"] = $coverImage;
+        }
         $validated['slug'] = Str::slug($validated['name']);
         DB::beginTransaction();
         $news = News::create($validated);

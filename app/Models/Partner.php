@@ -22,5 +22,8 @@ class Partner extends Model
         'is_visible' => 'boolean',
     ];
 
-    // public $timestamps = true;
+    public function getLogoAttribute($value){
+        return $value ? asset("/storage/uploads/") . $value : null;
+    }
+
 }
