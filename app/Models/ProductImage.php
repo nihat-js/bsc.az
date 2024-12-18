@@ -25,6 +25,11 @@ class ProductImage extends Model
         "rank"
     ];
 
+    public function getPathAttribute($value)
+    {
+        return asset('storage/uploads' . $value);
+    }
+
 
     // The attributes that should be cast to native types
     protected $casts = [

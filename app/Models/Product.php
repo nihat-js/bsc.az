@@ -33,6 +33,10 @@ class Product extends Model
         'price' => 'double', // Cast 'price' to a double
     ];
 
+    public function getCoverImageAttribute($value){
+        return $value ? asset("storage/uploads/products") . $value : null;
+    }
+
     // Disable automatic timestamps since the table has created_at and updated_at
     public $timestamps = true;
 
