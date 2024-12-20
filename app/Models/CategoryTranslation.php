@@ -21,6 +21,11 @@ class CategoryTranslation extends Model
         'name',
     ];
 
+    protected $hidden = [
+        "created_at",
+        "updated_at"
+    ];
+
     protected $casts = [
         'category_id' => 'integer',
         'lang_code' => 'string',

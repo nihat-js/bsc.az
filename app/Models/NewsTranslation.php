@@ -21,5 +21,9 @@ class NewsTranslation extends Model
     protected $casts = [
         'news_id' => 'integer',
     ];
+    protected $hidden = [
+        "created_at",
+        "updated_at"
+    ];
     public $timestamps = true;
 }

@@ -20,6 +20,11 @@ class PageTranslation extends Model
         'text',
     ];
 
+    protected $hidden = [
+        "created_at",
+        "updated_at",
+    ];
+
     protected $casts = [
         'page_id' => 'integer',
         'lang_id' => 'integer',

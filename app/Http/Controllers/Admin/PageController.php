@@ -60,7 +60,10 @@ class PageController extends Controller
         DB::commit();
 
 
-        return response()->json(["message" => "OK", "data" => $page->with("translations")]);
+        return response()->json([
+            "message" => "OK",
+            "data" => $page->with("translations")->get()
+        ]);
     }
     public function add(Request $request)
     {

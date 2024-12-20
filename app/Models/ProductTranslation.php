@@ -22,6 +22,11 @@ class ProductTranslation extends Model
         'description',
     ];
 
+    protected $hidden = [
+        "created_at",
+        "updated_at"
+    ];
+
     protected $casts = [
         'product_id' => 'integer',
         'lang_id' => 'integer',
