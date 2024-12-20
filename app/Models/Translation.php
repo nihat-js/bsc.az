@@ -11,4 +11,11 @@ class Translation extends Model
         "lang_code",
         "text"
     ];
+
+    protected $hidden = [
+        "table_name",
+        "table_id",
+        "created_at",
+        "updated_at"
+    ];
 }

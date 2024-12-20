@@ -53,7 +53,8 @@ class ColorCatalogController extends Controller
 
         DB::beginTransaction();
 
-        $color = ColorCatalog::findOrFail($id);
+        $color = ColorCatalog::with("translations")->findOrFail($id);
+        $color->update($validated);
 
         if (@$validated["translations"]) {
             foreach ($validated["translations"] as $translation) {
@@ -67,13 +68,14 @@ class ColorCatalogController extends Controller
                 ;
             }
         }
+        
 
         DB::commit();
 
         return response()->json([
             "status" => "ok",
             'message' => 'Color updated successfully',
-            'color' => $color->with("translations")->get()
+            'data' => $color->with("translations")->get()
         ]);
 
     }
