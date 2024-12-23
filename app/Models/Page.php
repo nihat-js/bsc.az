@@ -34,4 +34,8 @@ class Page extends Model
     {
         return $this->hasMany(PageTranslation ::class);
     }
+
+    public function getImageAttribute($value){
+        return $value ? asset("/storage/uploads/pages/" . $value )  : null;
+    }
 }

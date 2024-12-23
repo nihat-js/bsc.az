@@ -63,6 +63,8 @@ Route::post("admin/status", [AdminAuthController::class, 'status'])->name('admin
 // Route::post('admin/test', [AdminAuthController::class, 'test'])->name('admin.test');
 
 
+// Route::get("/news")
+
 
 Route::group(["middleware" => "auth:users"], function () {
 
@@ -91,16 +93,16 @@ Route::group(["middleware" => "auth:users"], function () {
     // Route::post("/basket/order/{order}/return", [$controller, 'returnOrder'])->name('basket.returnOrder');
 
 
-    Route::post("/add-to-cart", [UserProductController::class, 'addToCart'])->name('addToCart');
-    Route::post("/remove-from-cart", [UserProductController::class, 'removeFromCart'])->name('removeFromCart');
-    Route::post("/get-cart", [UserProductController::class, 'getCart'])->name('getCart');
-    Route::post("/get-cart-count", [UserProductController::class, 'getCartCount'])->name('getCartCount');
-    Route::post("/get-cart-total", [UserProductController::class, 'getCartTotal'])->name('getCartTotal');
+    // Route::post("/add-to-cart", [UserProductController::class, 'addToCart'])->name('addToCart');
+    // Route::post("/remove-from-cart", [UserProductController::class, 'removeFromCart'])->name('removeFromCart');
+    // Route::post("/get-cart", [UserProductController::class, 'getCart'])->name('getCart');
+    // Route::post("/get-cart-count", [UserProductController::class, 'getCartCount'])->name('getCartCount');
+    // Route::post("/get-cart-total", [UserProductController::class, 'getCartTotal'])->name('getCartTotal');
 
-    Route::post("add-to-wishlist", [UserProductController::class, 'addToWishlist'])->name('addToWishlist');
-    Route::post("remove-from-wishlist", [UserProductController::class, 'removeFromWishlist'])->name('removeFromWishlist');
-    Route::post("get-wishlist", [UserProductController::class, 'getWishlist'])->name('getWishlist');
-    Route::post("get-wishlist-count", [UserProductController::class, 'getWishlistCount'])->name('getWishlistCount');
+    // Route::post("add-to-wishlist", [UserProductController::class, 'addToWishlist'])->name('addToWishlist');
+    // Route::post("remove-from-wishlist", [UserProductController::class, 'removeFromWishlist'])->name('removeFromWishlist');
+    // Route::post("get-wishlist", [UserProductController::class, 'getWishlist'])->name('getWishlist');
+    // Route::post("get-wishlist-count", [UserProductController::class, 'getWishlistCount'])->name('getWishlistCount');
 
     Route::post("add-to-compare", [UserProductController::class, 'addToCompare'])->name('addToCompare');
     Route::post("remove-from-compare", [UserProductController::class, 'removeFromCompare'])->name('removeFromCompare');
