@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\ProductColorOptionController;
 use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\CategorySpecOptionController;
 use App\Http\Controllers\FilterController;
+use App\Http\Controllers\User\BasketController;
+use App\Http\Controllers\User\WishlistController;
 use App\Http\Middleware\AdminPermissionMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -45,9 +47,11 @@ Route::get("/developer-test", function () {
 
 
 
-Route::post('register', [UserAuthController::class, 'register'])->name('register');
-Route::post('login', [UserAuthController::class, 'login'])->name('');
-Route::post('logout', [UserAuthController::class, 'logout'])->name('')->middleware("auth:users");
+$controller = UserAuthController::class;
+Route::post('register', [$controller, 'register'])->name('register');
+Route::post('login', [$controller, 'login'])->name('');
+Route::post('logout', [$controller, 'logout'])->name('')->middleware("auth:users");
+Route::post("status", [$controller, 'status'])->name('status')->middleware("auth:users");
 // Route::post('test', [UserAuthController::class, 'test'])->middleware('auth:users');
 
 
@@ -61,6 +65,32 @@ Route::post("admin/status", [AdminAuthController::class, 'status'])->name('admin
 
 
 Route::group(["middleware" => "auth:users"], function () {
+
+
+    $controller = BasketController::class;
+    Route::get("/basket", [$controller, 'all'])->name('basket.all');
+    Route::post("/basket", [$controller, 'add'])->name('basket.add');
+    Route::put("/basket", [$controller, 'edit'])->name('basket.edit');
+    Route::get("/basket/total", [$controller, 'total'])->name('basket.total');
+    Route::delete("/basket", [$controller, 'clear'])->name('basket.clear');
+    Route::delete("/basket/{productId}", [$controller, 'remove'])->name('basket.remove');
+
+
+    $controller = WishlistController::class;
+    Route::get("/wishlist",[$controller, 'all'])->name('wishlist.all');
+    Route::post("/wishlist", [$controller, 'add'])->name('wishlist.add');
+    Route::delete("/wishlist", [$controller, 'clear'])->name('wishlist.clear');
+    Route::delete("/wishlist/{productId}", [$controller, 'remove'])->name('wishlist.remove');
+
+
+    // Route::post("/basket/remove", [$controller, 'remove'])->name('basket.remove');
+    // Route::post("/basket/checkout", [$controller, 'checkout'])->name('basket.checkout');
+    // Route::post("/basket/order", [$controller, 'order'])->name('basket.order');
+    // Route::post("/basket/order/{order}", [$controller, 'getOrder'])->name('basket.getOrder');
+    // Route::post("/basket/order/{order}/cancel", [$controller, 'cancelOrder'])->name('basket.cancelOrder');
+    // Route::post("/basket/order/{order}/return", [$controller, 'returnOrder'])->name('basket.returnOrder');
+
+
     Route::post("/add-to-cart", [UserProductController::class, 'addToCart'])->name('addToCart');
     Route::post("/remove-from-cart", [UserProductController::class, 'removeFromCart'])->name('removeFromCart');
     Route::post("/get-cart", [UserProductController::class, 'getCart'])->name('getCart');

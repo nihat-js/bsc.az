@@ -18,36 +18,39 @@ class AuthController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
         ]);
 
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-        ]);
+        $validatedData["password"] = Hash::make($validatedData["password"]);
+
+        $user = User::create($validatedData);
         return response()->json([
             'name' => $user->name,
             'email' => $user->email,
-        ]);
+        ], 201);
     }
     public function login(Request $request)
     {
-        $user = User::where('email', $request->email)->first();
+        $validated = $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
 
+        $user = User::where('email', $request->email)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => ['Username or password incorrect'],
-            ], 401); 
+                'message' => ['Email və ya şifrə yanlışdır'],
+            ]);
         }
+
 
         $token = $user->createToken('User Token')->plainTextToken;
 
         return response()->json([
             'status' => 'success',
             'message' => 'User logged in successfully',
-            'name' => $user->name,
+            'user' => $user,
             'token' => $token,
         ]);
     }
@@ -75,5 +78,15 @@ class AuthController extends Controller
                 'message' => 'User logged out successfully'
             ]
         );
+    }
+
+    public function status(Request $request){
+        $user = auth()->user();
+
+        return response()->json([
+            'status' => 'success',
+            // 'message' => '',
+            'data' => $request->user(),
+        ]);
     }
 }
