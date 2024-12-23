@@ -84,6 +84,7 @@ class PageController extends Controller
             "name" => "required|string|unique:pages,name",
             "text" => "required|string",
             'image' => 'nullable|string',
+            'is_visible' => 'nullable|boolean',
 
             'translations' => 'nullable|array',
             'translations.*.lang_code' => 'required|string|exists:languages,code',
