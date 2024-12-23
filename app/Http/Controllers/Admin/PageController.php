@@ -57,7 +57,7 @@ class PageController extends Controller
         DB::beginTransaction();
         $page->update($validated);
 
-        if ($validated['translations']) {
+        if (@$validated['translations']) {
             foreach ($validated['translations'] as $translation) {
                 $translation['slug'] = Str::slug($translation['name']);
                 $page->translations()->updateOrCreate(
