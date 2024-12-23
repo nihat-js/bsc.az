@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Services\ImageUploadService;
 use DB;
 use Illuminate\Http\Request;
+use Storage;
 use Str;
 
 class PageController extends Controller
 {
+    private $uploadPath = "uploads/pages/";
     public function all()
     {
         $pages = Page::with("translations")->get();
@@ -30,7 +33,7 @@ class PageController extends Controller
             "name" => "nullable|string|",
             "slug" => "nullable|string",
             "text" => "nullable|string",
-            'image' => 'nullable|file',
+            'image' => 'nullable|string',
             "is_visible" => "nullable|boolean",
 
             'translations' => 'nullable|array',
@@ -40,7 +43,17 @@ class PageController extends Controller
             // 'translations.*.slug' => 'required  |string|unique:page_translates,slug|max:255', //add eleyende avtomatik yaradilmasi
         ]);
 
-        $page = Page::findOrFail($id);
+        
+
+        $page = Page::with("translations")->findOrFail($id);
+        if (@$validated["image"]) {
+            Storage::disk('public')->makeDirectory($this->uploadPath); // her ehtimala qarsi
+            Storage::disk("public")->delete( $this->uploadPath .  $page->getRawOriginal("image"));
+            $coverImage = ImageUploadService::uploadBase64Image($validated["image"], $this->uploadPath);
+            $validated["image"] = $coverImage;
+        }
+
+
         DB::beginTransaction();
         $page->update($validated);
 
@@ -61,8 +74,8 @@ class PageController extends Controller
 
 
         return response()->json([
-            "message" => "OK",
-            "data" => $page->with("translations")->get()
+            "status" => "ok",
+            "data" => $page
         ]);
     }
     public function add(Request $request)
@@ -70,7 +83,7 @@ class PageController extends Controller
         $validated = $request->validate([
             "name" => "required|string|unique:pages,name",
             "text" => "required|string",
-            'image' => 'nullable|file',
+            'image' => 'nullable|string',
 
             'translations' => 'nullable|array',
             'translations.*.lang_code' => 'required|string|exists:languages,code',
@@ -78,6 +91,13 @@ class PageController extends Controller
             'translations.*.text' => 'required|string',
             // 'translations.*.slug' => 'required  |string|unique:page_translates,slug|max:255', //add eleyende avtomatik yaradilmasi
         ]);
+
+        
+        Storage::disk('public')->makeDirectory($this->uploadPath);
+        if (@$validated["image"]) {
+            $image = ImageUploadService::uploadBase64Image($validated["image"], $this->uploadPath);
+            $validated["image"] = $image;
+        }
 
 
         DB::beginTransaction();
@@ -100,7 +120,8 @@ class PageController extends Controller
 
 
         return response()->json([
-            'message' => 'OK',
+            'status' => 'ok',
+            'data' => $page->load('translations'),
             // 'data' => $page->load('translations'),
         ], 201);
     }
