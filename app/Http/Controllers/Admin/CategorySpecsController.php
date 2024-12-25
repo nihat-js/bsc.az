@@ -70,7 +70,7 @@ class CategorySpecsController extends Controller
     public function all()
     {
 
-        $categorySpecs = CategorySpecs::with("options", "options.translations", "category", )
+        $categorySpecs = CategorySpecs::with("options", "options.translations", "category","translations" )
             ->get();
 
         // foreach ($categorySpecs as $categorySpec) {
