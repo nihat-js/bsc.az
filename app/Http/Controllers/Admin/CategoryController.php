@@ -88,19 +88,21 @@ class CategoryController extends Controller
             'translations.*.slug' => 'nullable|string',
         ]);
 
-        // return response()->json($validated);
+        DB::beginTransaction();
         $category = Category::findOrFail($request->id);
         // dd($validated);
+        // return ["a" => $validated];
         $category->update($validated);
         if (@$validated['translations']) {
             foreach ($validated['translations'] as $translation) {
+                $translation["slug"] = Str::slug($translation["name"]);
                 $category->translations()->updateOrCreate(
                     ['lang_code' => $translation['lang_code']],
                     $translation
                 );
             }
         }
-
+        DB::commit();
         return response()->json($category->load('translations'), 201);
     }
 
