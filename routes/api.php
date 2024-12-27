@@ -277,6 +277,7 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::post("/category-spec-options/bulk", [$controller, 'bulkAdd'])->name('categorySpecOptions.bulkAdd');
     Route::get("/category-spec-options", [$controller, 'all'])->name('categorySpecOptions.all');
     Route::delete("/category-spec-options/{id}", [$controller, 'delete'])->name('categorySpecOptions.delete');
+    Route::put("/category-spec-options/{id}", [$controller, 'edit'])->name('categorySpecOptions.edit');
 
     // Route::get("/category-spec-options/category/{categoryId}", [CategorySpecOptionController::class, 'categoryOptions'])->name('categorySpecs.categoryOptions');    
 

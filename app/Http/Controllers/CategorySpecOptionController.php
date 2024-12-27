@@ -19,11 +19,6 @@ class CategorySpecOptionController extends Controller
             ]
         );
 
-        // return response()->json([
-        //     'status' => ' ok',
-        //     'message' => 'Category spec option added successfully'
-        // ]);
-
         DB::beginTransaction();
         $categorySpecOption = CategorySpecOption::create($validated);
 
@@ -38,6 +33,46 @@ class CategorySpecOptionController extends Controller
         return response()->json([
             'status' => ' ok',
             'message' => 'Category spec option added successfully'
+        ]);
+    }
+
+    public function edit(Request $request,$id)
+    {
+        $validated = $request->validate(
+            [
+                'text' => 'required|string',
+                "translations" => "nullable|array",
+                "translations.*.lang_code" => "required|exists:languages,code",
+                "translations.*.text" => "required|string",
+
+            ]
+        );
+
+        $categorySpecOption = CategorySpecOption::with("translations")->findOrFail($id);
+        DB::beginTransaction();
+        $categorySpecOption->update($validated);
+
+
+        if (@$validated["translations"]) {
+            foreach ($validated["translations"] as $translation) {
+                $translation["table_name"] = "category_spec_options";
+                $categorySpecOption->translations()->updateOrCreate(
+                    [
+                        "lang_code" => $translation['lang_code']
+                    ],
+                    $translation
+                );
+            }
+        }
+
+        DB::commit();
+
+
+
+        return response()->json([
+            'status' => ' ok',
+            'message' => 'Category spec option updated successfully',
+            'data' => $categorySpecOption->refresh()
         ]);
     }
 
@@ -96,9 +131,10 @@ class CategorySpecOptionController extends Controller
         ]);
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
 
-        
+
         $categorySpecOption = CategorySpecOption::findOrFail($id);
         DB::beginTransaction();
         $categorySpecOption->translations()->delete();
