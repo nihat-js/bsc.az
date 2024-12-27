@@ -17,6 +17,7 @@ use App\Http\Controllers\admin\RoleController;
 use App\Http\Controllers\CategorySpecOptionController;
 use App\Http\Controllers\FilterController;
 use App\Http\Controllers\User\BasketController;
+use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\WishlistController;
 use App\Http\Middleware\AdminPermissionMiddleware;
 use Illuminate\Http\Request;
@@ -53,6 +54,16 @@ Route::post('login', [$controller, 'login'])->name('');
 Route::post('logout', [$controller, 'logout'])->name('')->middleware("auth:users");
 Route::post("status", [$controller, 'status'])->name('status')->middleware("auth:users");
 // Route::post('test', [UserAuthController::class, 'test'])->middleware('auth:users');
+
+
+Route::group([
+    "middleware" => "auth:users",
+    // "prefix" => "user"
+],function(){
+
+    Route::get("/profile", [ProfileController::class, 'info'])->name('info');
+    Route::put("/profile", [ProfileController::class, 'edit'])->name('edit');
+});
 
 
 
