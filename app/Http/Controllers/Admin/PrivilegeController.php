@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use DB;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -11,6 +12,11 @@ use Spatie\Permission\Models\Role;
 class PrivilegeController extends Controller
 {
 
+    public function rolesWithPermissions()
+    {
+        $roles = Role::with('permissions')->get();
+        return response()->json(["status" => "ok", "data" => $roles]);
+    }
     public function roles()
     {
         // $role = auth()->user()->roles;
@@ -29,88 +35,124 @@ class PrivilegeController extends Controller
     }
     public function addRole()
     {
-        $role = auth()->user()->role;
-        if ($role != "Super Admin") {
-            return response()->json(["message" => "You are not allowed to create a role"], 403);
-        }
+        // Ensure the user is a Super Admin
+        // $role = auth()->user()->role;
+        // auth()->user()->assignRole("Super Admin");
+        // return [$role];
+        // return response()->json(["message" => "You are a super admin"]);
+        // return [
+        //     "role" => auth()->user()->role,
+        //     "roles" => auth()->user()->roles
+        // ];
+        // if ($role != "Super Admin") {
+        //     return response()->json(["message" => "You are not allowed to create a role"], 403);
+        // }
+
         $validated = request()->validate([
             "name" => "required|string|unique:roles,name",
-            "permissions" => "nullable|array"
+            "permissions" => "nullable|array",
+            "permissions.*" => "string|exists:permissions,name"
         ]);
 
-        Role::create(["name" => $validated["name"], "guard_name" => "admin",]);
-        $role = Role::where("name", $validated["name"])->first();
-        // $role->givePermissionTo($validated["permissions"]);
-        // Permission::whereIn("name", $validated["permissions"])->get()->each(function ($permission) use ($validated) {
-        //     $role->givePermissionTo($permission);
-        // });
+        DB::beginTransaction();
+        $role = Role::create([
+            "name" => $validated["name"],
+            "guard_name" => "admins",
+        ]);
+
+        if (isset($validated["permissions"]) && count($validated["permissions"]) > 0) {
+            $permissions = Permission::whereIn("name", $validated["permissions"])->get();
+            foreach ($permissions as $permission) {
+                $role->givePermissionTo($permission);
+            }
+        }
+        DB::commit();
+        return response()->json([
+            'status' => 'ok',
+            "message" => "Role created successfully"
+        ], 201);
     }
 
-    public function deleteRole()
+    public function editRole(Request $request, $id)
     {
-        $role = auth()->user()->role;
-        if ($role != "Super Admin") {
-            return response()->json(["status" => "You are not allowed to delete a role"], 403);
-        }
-        $validated = request()->validate([
-            "name" => "required|string",
+        $request->validate([
+            'name' => 'required|string',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string|exists:permissions,name'
         ]);
 
-        $role = Role::where("name", $validated["name"])->first();
-        if (!$role) {
-            return response()->json(["status" => "Role not found"], 404);
+        $role = Role::with('permissions')->findOrFail($id);
+
+        DB::beginTransaction();
+        $role->update($request->all());
+
+        if (@$request["permissions"]) {
+            $permissions = Permission::where("guard_name", "admins")
+                ->whereIn('name', $request->permissions)->get();
+            $role->syncPermissions($permissions);
         }
+        DB::commit();
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Role updated successfully',
+            'data' => $role->load("permissions")
+        ]);
+    }
+
+    public function deleteRole($id)
+    {
+        // $role = auth()->user()->role;
+        // if ($role != "Super Admin") {
+        //     return response()->json(["status" => "You are not allowed to delete a role"], 403);
+        // }
+        // $validated = request()->validate([
+        //     "name" => "required|string",
+        // ]);
+
+        // $role = Role::where("name", $validated["name"])->first();
+        // if (!$role) {
+        //     return response()->json(["status" => "Role not found"], 404);
+        // }
+
+        $role = Role::findOrFail($id);
+        $role->permissions()->detach();
         $role->delete();
-    }
 
-    public function editRole()
-    {
-        $role = auth()->user()->role;
-        if ($role != "Super Admin") {
-            return response()->json(["status" => "You are not allowed to edit a role"], 403);
-        }
-        $validated = request()->validate([
-            "name" => "required|string",
-            "new_name" => "required|string",
-            "permissions" => "nullable|array"
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Role deleted successfully',
+            'data' => $role
         ]);
-
-        $role = Role::where("name", $validated["name"])->first();
-        if (!$role) {
-            return response()->json(["status" => "Role not found"], 404);
-        }
-        $role->name = $validated["new_name"];
-        $role->save();
-        // $role->syncPermissions($validated["permissions"]);
-        // Permission::whereIn("name", $validated["permissions"])->get()->each(function ($permission) use ($role) {
-        //     $role->givePermissionTo($permission);
-        // });
     }
 
-    public function permissions(){
+
+    public function permissions()
+    {
         // $role = auth()->user()->role;
 
-      
-        $permissions = Permission::where("guard_name","admins")->get();
+
+        $permissions = Permission::where("guard_name", "admins")->get();
         $permissions = $permissions->map(function ($permission) {
             return $permission->name;
         });
         return response()->json(["status" => "OK", "data" => $permissions]);
     }
 
-    public function addPermission(){
-        $role = auth()->user()->role;
-        if ($role != "Super Admin") {
-            return response()->json(["status" => "You are not allowed to create a permission"], 403);
-        }
-        $validated = request()->validate([
-            "name" => "required|string|unique:permissions,name",
-        ]);
+    // public function addPermission()
+    // {
+    //     $role = auth()->user()->role;
+    //     if ($role != "Super Admin") {
+    //         return response()->json(["status" => "You are not allowed to create a permission"], 403);
+    //     }
+    //     $validated = request()->validate([
+    //         "name" => "required|string|unique:permissions,name",
+    //     ]);
 
-        Permission::create(["name" => $validated["name"], "guard_name" => "admin",]);
-    }
+    //     Permission::create(["name" => $validated["name"], "guard_name" => "admin",]);
+    // }
 
-    public function deletePermission(){
+    public function deletePermission()
+    {
         $role = auth()->user()->role;
         if ($role != "Super Admin") {
             return response()->json(["status" => "You are not allowed to delete a permission"], 403);
@@ -126,7 +168,8 @@ class PrivilegeController extends Controller
         $permission->delete();
     }
 
-    public function editPermission(){
+    public function editPermission()
+    {
         $role = auth()->user()->role;
         if ($role != "Super Admin") {
             return response()->json(["status" => "You are not allowed to edit a permission"], 403);
@@ -144,7 +187,8 @@ class PrivilegeController extends Controller
         $permission->save();
     }
 
-    public function assignRole(){
+    public function assignRole()
+    {
         $role = auth()->user()->role;
         if ($role != "Super Admin") {
             return response()->json(["status" => "You are not allowed to assign a role"], 403);
@@ -161,6 +205,6 @@ class PrivilegeController extends Controller
         $user->assignRole($validated["role"]);
     }
 
-    
+
 
 }

@@ -237,9 +237,13 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
 
 
 
-    Route::get('/roles', action: [PrivilegeController::class, 'roles'])->name('priviliege.roles');
-    Route::get('/permissions', action: [PrivilegeController::class, 'permissions'])->name('privilege.permissions');
-    Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privilege.addPermission');
+    Route::get('roles', action: [PrivilegeController::class, 'roles'])->name('priviliege.roles');
+    Route::get('permissions', action: [PrivilegeController::class, 'permissions'])->name('privilege.permissions');
+    // Route::post("/permissions", [PrivilegeController::class, 'addPermission'])->name('privilege.addPermission');
+    Route::get("/roles-with-permissions", [PrivilegeController::class, 'rolesWithPermissions'])->name('privilege.rolesWithPermissions');
+    Route::post("roles", [PrivilegeController::class, 'addRole'])->name('roles.addRole');
+    Route::put("roles/{id}", [PrivilegeController::class, 'editRole'])->name('roles.editRole');
+    Route::delete("roles/{id}", [PrivilegeController::class, 'deleteRole'])->name('roles.deleteRole');
 
 
     Route::get("/admins", [AdminController::class, 'all'])->name('admins.all');
