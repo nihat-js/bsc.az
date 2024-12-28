@@ -69,7 +69,8 @@ class PrivilegeController extends Controller
         DB::commit();
         return response()->json([
             'status' => 'ok',
-            "message" => "Role created successfully"
+            "message" => "Role created successfully",
+            'data' => $role->load("permissions")
         ], 201);
     }
 
@@ -114,7 +115,7 @@ class PrivilegeController extends Controller
         //     return response()->json(["status" => "Role not found"], 404);
         // }
 
-        $role = Role::findOrFail($id);
+        $role = Role::with("permissions")->findOrFail($id);
         $role->permissions()->detach();
         $role->delete();
 
