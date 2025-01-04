@@ -14,16 +14,23 @@ class CampaignController extends Controller
     public function all()
     {
 
-        $services = Campaign::with("translations")->get();
+        $campaigns = Campaign::with("translations")->get();
         return response()->json([
             'status' => 'ok',
-            'data' => $services
+            'data' => $campaigns
         ]);
     }
 
     public function one(Request $request, $id)
     {
-        $service = Campaign::with("translations")->findOrFail($id);
+        $service = Campaign::with("translations")
+        ->with("products")
+        ->with("products.product")
+        // ->with("products.product.translations")
+        ->with("products.product.images")
+        ->with("products.product.colors")
+        ->with("products.product.images")
+        ->findOrFail($id);
         return response()->json([
             'status' => 'ok',
             'data' => $service
@@ -123,15 +130,31 @@ class CampaignController extends Controller
     }
 
 
-    public function addProduct(Request $request, $id, $productId)
+
+    public function addProduct(Request $request, $id, )
     {
+        $request->validate([
+            'product_id' => 'required|exists:products,id|unique:campaign_products,product_id,NULL,id,campaign_id,' . $id,
+        ]);
         $campaign = Campaign::findOrFail($id);
-        $campaign->products()->attach($productId);
+        $campaign->products()->create($request->all());
         return response()->json([
             'status' => 'ok',
             'message' => 'Product added to campaign successfully',
+            'data' => $campaign->load("products")
+        ]);
+    }
+
+    public function removeProduct(Request $request, $id){
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+        ]);
+        $campaign = Campaign::findOrFail($id);
+        $campaign->products()->where("product_id", $request->product_id)->delete();
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Product removed from campaign successfully',
             'data' => $campaign
         ]);
-
     }
 }

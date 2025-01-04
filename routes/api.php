@@ -162,7 +162,8 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::post("/campaigns", [CampaignController::class, 'add'])->name('campaigns.add');
     Route::put("/campaigns/{id}", [CampaignController::class, 'edit'])->name('campaigns.edit');
     Route::delete("/campaigns/{id}", [CampaignController::class, 'delete'])->name('campaigns.delete');
-    Route::get("/campaigns/{id}/addProduct/{productId}", [CampaignController::class, 'addProduct'])->name('campaigns.addProduct');
+    Route::post("/campaigns/{id}/addProduct/", [CampaignController::class, 'addProduct'])->name('campaigns.addProduct');
+    Route::delete("/campaigns/{id}/removeProduct/", [CampaignController::class, 'removeProduct'])->name('campaigns.removeProduct');
 
 
     Route::get("/category-specs", [CategorySpecsController::class, 'all'])->name('categorySpecs.all');
