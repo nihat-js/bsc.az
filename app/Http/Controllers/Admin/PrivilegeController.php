@@ -106,14 +106,8 @@ class PrivilegeController extends Controller
         // if ($role != "Super Admin") {
         //     return response()->json(["status" => "You are not allowed to delete a role"], 403);
         // }
-        // $validated = request()->validate([
-        //     "name" => "required|string",
-        // ]);
 
-        // $role = Role::where("name", $validated["name"])->first();
-        // if (!$role) {
-        //     return response()->json(["status" => "Role not found"], 404);
-        // }
+   
 
         $role = Role::with("permissions")->findOrFail($id);
         $role->permissions()->detach();

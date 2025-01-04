@@ -4,6 +4,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CampaignController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CategorySpecsController;
 use App\Http\Controllers\Admin\ColorCatalogController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PrivilegeController;
 use App\Http\Controllers\Admin\ProductColorOptionController;
 use App\Http\Controllers\admin\RoleController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\CategorySpecOptionController;
 use App\Http\Controllers\FilterController;
 use App\Http\Controllers\User\BasketController;
@@ -153,6 +155,14 @@ Route::group(["middleware" => "auth:users"], function () {
 
 
 Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissionMiddleware::class])->group(function () {
+
+
+    Route::get("/campaigns", [CampaignController::class, 'all'])->name('campaigns.all');
+    Route::get("/campaigns/{id}", [CampaignController::class, 'one'])->name('campaigns.one');
+    Route::post("/campaigns", [CampaignController::class, 'add'])->name('campaigns.add');
+    Route::put("/campaigns/{id}", [CampaignController::class, 'edit'])->name('campaigns.edit');
+    Route::delete("/campaigns/{id}", [CampaignController::class, 'delete'])->name('campaigns.delete');
+    Route::get("/campaigns/{id}/addProduct/{productId}", [CampaignController::class, 'addProduct'])->name('campaigns.addProduct');
 
 
     Route::get("/category-specs", [CategorySpecsController::class, 'all'])->name('categorySpecs.all');
@@ -309,6 +319,11 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
 
     Route::get("/filter/category/id/{categoryId}", [FilterController::class, 'all'])->name('filter.all');
 
+    Route::get("services", [ServiceController::class, 'all'])->name('services.all');
+    Route::get("services/{id}", [ServiceController::class, 'one'])->name('services.one');
+    Route::put("services/{id}", [ServiceController::class, 'edit'])->name('services.edit');
+    Route::post("services", [ServiceController::class, 'add'])->name('services.add');
+    Route::delete("services/{id}", [ServiceController::class, 'delete'])->name('services.delete');
 
 });
 
