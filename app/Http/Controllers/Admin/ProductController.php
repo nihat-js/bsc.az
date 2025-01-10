@@ -153,8 +153,9 @@ class ProductController extends Controller
         DB::commit();
 
         return response()->json([
+            "status" => "ok",
             'message' => 'Product created successfully',
-            // 'data' => $product->load('translations'), // Include translations in the response
+            'data' => $product->load('translations'), // Include translations in the response
         ], 201);
     }
 
@@ -327,7 +328,11 @@ class ProductController extends Controller
         DB::commit();
         return response()->json([
             'message' => 'Product updated successfully',
-            // 'data' => $product->load('translations'),
+            'data' => $product->load('translations')
+            ->load("specs")
+            ->load("images")
+            ->load("colors")
+            ->load("category")
         ], 200);
     }
 

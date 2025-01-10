@@ -5,7 +5,7 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class Base64Image implements ValidationRule
+class _Base64Image implements ValidationRule
 {
     /**
      * Run the validation rule.
