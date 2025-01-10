@@ -99,8 +99,7 @@ class ServiceController extends Controller
             Storage::disk('public')->makeDirectory($this->uploadPath);
             Storage::disk("public")->delete($this->uploadPath . $service->getRawOriginal("cover_image"));
             $coverImage = ImageUploadService::uploadBase64Image($request["cover_image"], $this->uploadPath);
-            $service->cover_image = $coverImage;
-            $service->save();
+            $request["cover_image"] = $coverImage;
         }
 
         $service->update($request->all());
