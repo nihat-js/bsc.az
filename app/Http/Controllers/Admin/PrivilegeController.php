@@ -201,5 +201,40 @@ class PrivilegeController extends Controller
     }
 
 
+    public function removePermissionFromRole(Request $request,$id){
+        $role = Role::findOrFail($id);
+        $request->validate([
+            "permission" => "required|string|exists:permissions,name"
+        ]);
+        $permission = Permission::where("name",$request->permission)->first();
+        if(!$permission){
+            return response()->json(["status" => "Permission not found"],404);
+        }
+        $role->revokePermissionTo($permission);
+        return response()->json([
+            "status" => "ok",
+            "message" => "Permission revoked successfully",
+            "data" => $role->load("permissions")
+        ]);
+    }
+
+    public function addPermissionToRole(Request $request,$id){
+        $role = Role::findOrFail($id);
+        $request->validate([
+            "permission" => "required|string|exists:permissions,name"
+        ]);
+        $permission = Permission::where("name",$request->permission)->first();
+        if(!$permission){
+            return response()->json(["status" => "Permission not found"],404);
+        }
+        $role->givePermissionTo($permission);
+        return response()->json([
+            "status" => "ok",
+            "message" => "Permission added successfully",
+            "data" => $role->load("permissions")
+        ]);
+    }
+
+
 
 }

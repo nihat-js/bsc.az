@@ -163,6 +163,7 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::put("/campaigns/{id}", [CampaignController::class, 'edit'])->name('campaigns.edit');
     Route::delete("/campaigns/{id}", [CampaignController::class, 'delete'])->name('campaigns.delete');
     Route::post("/campaigns/{id}/addProduct/", [CampaignController::class, 'addProduct'])->name('campaigns.addProduct');
+    Route::post("/campaigns/{id}/bulkAddProducts/", [CampaignController::class, 'bulkAddProducts'])->name('campaigns.bulkAddProducts');
     Route::delete("/campaigns/{id}/removeProduct/", [CampaignController::class, 'removeProduct'])->name('campaigns.removeProduct');
 
 
@@ -255,6 +256,9 @@ Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissi
     Route::post("roles", [PrivilegeController::class, 'addRole'])->name('roles.addRole');
     Route::put("roles/{id}", [PrivilegeController::class, 'editRole'])->name('roles.editRole');
     Route::delete("roles/{id}", [PrivilegeController::class, 'deleteRole'])->name('roles.deleteRole');
+
+    Route::post("/roles/{id}/addPermission", [PrivilegeController::class, 'addPermissionToRole'])->name('roles.addPermissionToRole');
+    Route::delete("/roles/{id}/removePermission", [PrivilegeController::class, 'removePermissionFromRole'])->name('roles.removePermissionFromRole');
 
 
     Route::get("/admins", [AdminController::class, 'all'])->name('admins.all');

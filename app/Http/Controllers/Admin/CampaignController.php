@@ -145,6 +145,22 @@ class CampaignController extends Controller
         ]);
     }
 
+    public function bulkAddProducts(Request $request,$id){
+        $request->validate([
+            'products' => 'required|array',
+            'products.*.product_id' => 'required|exists:products,id|unique:campaign_products,product_id,NULL,id,campaign_id,' . $id,
+        ]);
+        $campaign = Campaign::findOrFail($id);
+        foreach($request->products as $product){
+            $campaign->products()->create($product);
+        }
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Products added to campaign successfully',
+            'data' => $campaign->load("products")
+        ]);
+    }
+
     public function removeProduct(Request $request, $id){
         $request->validate([
             'product_id' => 'required|exists:products,id',
