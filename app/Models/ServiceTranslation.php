@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceTranslation extends Model
 {
-    public $fillable = ['lang_code','name', 'text'];
+    public $fillable = ['lang_code','name','description','text'];
 }

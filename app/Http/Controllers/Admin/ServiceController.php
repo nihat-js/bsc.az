@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Service;
+use App\Services\ImageUploadService;
 use DB;
 use Illuminate\Http\Request;
+use Storage;
 
 class ServiceController extends Controller
 {
+
+    private $uploadPath = 'uploads/services/';
     public function all()
     {
 
@@ -41,12 +45,22 @@ class ServiceController extends Controller
             "translations" => "nullable|array",
             "translations.*.lang_code" => "required|string|exists:languages,code",
             "translations.*.name" => "required|string",
+            "translations.*.description" => "required|string",
             "translations.*.text" => "nullable|string",
         ]);
 
 
         DB::beginTransaction();
         $service = Service::create($request->all());
+
+        $uploadPath = 'uploads/services/';
+        Storage::disk('public')->makeDirectory($uploadPath);
+
+        if (@$request["cover_image"]) {
+            $coverImage = ImageUploadService::uploadBase64Image($request["cover_image"], $uploadPath);
+            $service["cover_image"] = $coverImage;
+            $service->save();
+        }
 
         if ($request->has('translations')) {
             foreach ($request->translations as $translation) {
@@ -72,11 +86,22 @@ class ServiceController extends Controller
             "translations" => "nullable|array",
             "translations.*.lang_code" => "required|string|exists:languages,code",
             "translations.*.name" => "required|string",
+            "translations.*.description" => "required|string",
             "translations.*.text" => "nullable|string",
         ]);
 
         $service = Service::with("translations")->findOrFail($id);
         DB::beginTransaction();
+
+
+
+        if (@$request["cover_image"]) {
+            Storage::disk('public')->makeDirectory($this->uploadPath);
+            Storage::disk("public")->delete($this->uploadPath . $service->getRawOriginal("cover_image"));
+            $coverImage = ImageUploadService::uploadBase64Image($request["cover_image"], $this->uploadPath);
+            $service->cover_image = $coverImage;
+        }
+
         $service->update($request->all());
         if ($request->has('translations')) {
             foreach ($request->translations as $translation) {
