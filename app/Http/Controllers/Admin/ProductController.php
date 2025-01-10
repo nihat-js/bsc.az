@@ -164,6 +164,8 @@ class ProductController extends Controller
         $page = (int) request()->query("p") ?: 1;
         $limit = (int) request()->query("l") ?: 50;
 
+        $allCount = Product::count();
+
         // $filter = $request->filter;/
 
         $products = Product::with("translations")
@@ -198,7 +200,11 @@ class ProductController extends Controller
             $product["specs"] = $arr;
         }
 
-        return response()->json(["message" => "OK", "data" => $products]);
+        return response()->json([
+            "message" => "OK", 
+            "count" => $allCount,
+            "data" => $products,
+        ]);
     }
 
     public function uploadImage()
