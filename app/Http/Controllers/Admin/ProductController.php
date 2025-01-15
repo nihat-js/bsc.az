@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Campaign;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductSpec;
@@ -85,6 +86,8 @@ class ProductController extends Controller
             'translations.*.description' => 'nullable|string',
 
             "images" => "nullable|array",
+
+            "campaign_id" => "nullable|integer|exists:campaigns,id",
             // "images.*." => "string",
         ]);
 
@@ -149,6 +152,12 @@ class ProductController extends Controller
             }
         }
 
+        if (@$validated["campaign_id"]) {
+            $campaign = Campaign::find($validated["campaign_id"]);
+            $campaign->products()->create([
+                "product_id" => $product->id,
+            ]);
+        }
 
         DB::commit();
 
