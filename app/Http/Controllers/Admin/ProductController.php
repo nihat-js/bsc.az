@@ -86,6 +86,7 @@ class ProductController extends Controller
             'translations.*.description' => 'nullable|string',
 
             "images" => "nullable|array",
+            "images.*.data" => "required|string",
 
             "campaign_id" => "nullable|integer|exists:campaigns,id",
             // "images.*." => "string",
@@ -141,7 +142,7 @@ class ProductController extends Controller
         if (@$validated["images"]) {
             $filenames = [];
             foreach ($validated["images"] as $image) {
-                $filename = ImageUploadService::uploadBase64Image($image, $uploadPath);
+                $filename = ImageUploadService::uploadBase64Image($image["data"], $uploadPath);
                 $filenames[] = $folderName . "/" . $filename;
             }
             foreach ($filenames as $index => $filename) {
@@ -164,7 +165,11 @@ class ProductController extends Controller
         return response()->json([
             "status" => "ok",
             'message' => 'Product created successfully',
-            'data' => $product->load('translations'), // Include translations in the response
+            'data' => $product->load('translations')
+            ->load("specs")
+            ->load("images")
+            ->load("colors")
+            ->load("category")
         ], 201);
     }
 
