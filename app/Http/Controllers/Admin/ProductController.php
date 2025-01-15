@@ -172,6 +172,7 @@ class ProductController extends Controller
         $products = Product::with("translations")
             ->with("specs")
             ->with("images")
+            ->with("category")
             ->skip(($page - 1) * $limit)->take($limit)->get();
 
         $arr = collect();

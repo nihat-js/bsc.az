@@ -14,6 +14,7 @@ class CountryController extends Controller
         $validated = $request->validate([
             'name' => 'required|unique:countries|max:255',
             'code' => 'required|unique:countries|max:255',
+            'is_visible' => 'sometimes|boolean',
             'phone_code' => 'nullable|max:255',
             "translations" => "nullable|array",
             "translations.*.lang_code" => "required|string|max:255|exists:languages,code",
@@ -41,7 +42,11 @@ class CountryController extends Controller
 
         DB::commit();
 
-        return response()->json(['message' => 'Country added successfully']);
+        return response()->json([
+            'error' => false,
+            'message' => 'Country added successfully',
+            'data' => $country
+        ]);
 
     }
 
@@ -53,6 +58,7 @@ class CountryController extends Controller
         $validated = $request->validate([
             'name' => 'nullable|max:255',
             'code' => 'nullable|max:255|',
+            'is_visible' => 'sometimes|boolean',
             'phone_code' => 'nullable|max:255',
             "translations" => "nullable|array",
             "translations.*.lang_code" => "required|string|max:255|exists:languages,code",

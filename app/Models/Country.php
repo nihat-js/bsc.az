@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Country extends Model
 {
-    public $fillable = ['name', 'code', 'phone_code'];
+    public $fillable = ['name', 'code', 'phone_code','is_visible'];
+
+    protected $casts = [
+        'is_visible' => 'boolean',  // Cast 'is_visible' to a boolean
+    ];
 
 
     public function translations(){
