@@ -142,7 +142,7 @@ class ProductController extends Controller
         if (@$validated["images"]) {
             $filenames = [];
             foreach ($validated["images"] as $image) {
-                $filename = ImageUploadService::uploadBase64Image($image["data"], $uploadPath);
+                $filename = ImageUploadService::uploadBase64Image($image["path"], $uploadPath);
                 $filenames[] = $folderName . "/" . $filename;
             }
             foreach ($filenames as $index => $filename) {
