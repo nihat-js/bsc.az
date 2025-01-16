@@ -166,31 +166,39 @@ class CategorySpecsController extends Controller
         $categorySpecs->update($validated);
 
         if ($request->has('options')) {
-            foreach ($request->options as $option) {
-                $categorySpecOption = CategorySpecOption::where("category_spec_id", $categorySpecs->id)
-                    ->where("text", $option["text"])->first();
-                if ($categorySpecOption) {
-                    $categorySpecOption->update($option);
-                } else {
-                    $categorySpecOption = CategorySpecOption::create(
+            $categorySpecOptionsTexts = $categorySpecs->options()->pluck("text")->toArray();
+            $optionTexts = array_column($request->options, "text");
+            $optionTextsToDelete = array_diff($categorySpecOptionsTexts, $optionTexts);
+            if ($optionTextsToDelete) {
+                CategorySpecOption::where("category_spec_id", $categorySpecs->id)
+                    ->whereIn("text", $optionTextsToDelete)->delete();
+            }
+        }
+
+        foreach ($request->options as $option) {
+            $categorySpecOption = CategorySpecOption::where("category_spec_id", $categorySpecs->id)
+                ->where("text", $option["text"])->first();
+            if ($categorySpecOption) {
+                $categorySpecOption->update($option);
+            } else {
+                $categorySpecOption = CategorySpecOption::create(
+                    [
+                        "category_spec_id" => $categorySpecs->id,
+                        "text" => $option["text"],
+                    ]
+                );
+            }
+            if (@$option["translations"]) {
+                foreach ($option["translations"] as $translation) {
+                    $translation["table_name"] = "category_spec_options";
+                    $categorySpecOption->translations()->updateOrCreate(
                         [
-                            "category_spec_id" => $categorySpecs->id,
-                            "text" => $option["text"],
-                        ]
+                            "table_name" => "category_spec_options",
+                            "table_id" => $categorySpecOption->id,
+                            "lang_code" => $translation["lang_code"],
+                        ],
+                        $translation
                     );
-                }
-                if (@$option["translations"]) {
-                    foreach ($option["translations"] as $translation) {
-                        $translation["table_name"] = "category_spec_options";
-                        $categorySpecOption->translations()->updateOrCreate(
-                            [
-                                "table_name" => "category_spec_options",
-                                "table_id" => $categorySpecOption->id,
-                                "lang_code" => $translation["lang_code"],
-                            ],
-                            $translation
-                        );
-                    }
                 }
             }
         }
