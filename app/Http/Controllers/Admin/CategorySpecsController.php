@@ -59,6 +59,7 @@ class CategorySpecsController extends Controller
             }
         }
 
+
         DB::commit();
 
         return response()->json([
@@ -70,7 +71,7 @@ class CategorySpecsController extends Controller
     public function all()
     {
 
-        $categorySpecs = CategorySpecs::with("options", "options.translations", "category","translations" )
+        $categorySpecs = CategorySpecs::with("options", "options.translations", "category", "translations")
             ->get();
 
         // foreach ($categorySpecs as $categorySpec) {
@@ -113,9 +114,9 @@ class CategorySpecsController extends Controller
     public function getByCategory($id)
     {
         $categorySpecs = CategorySpecs::where("category_id", $id)
-        ->with("translations")
-        ->with("options")
-        ->get();
+            ->with("translations")
+            ->with("options")
+            ->get();
 
         return response()->json([
             "status" => "ok",
@@ -147,7 +148,7 @@ class CategorySpecsController extends Controller
             "name" => "sometimes|required", // default olaraq az dilde olmalidir diglerini translationla elave edeceyik
             "group_name" => "sometimes|string", // 
             "show_in_filter" => "nullable|boolean",
-            "options.*.id" => "required|exists:category_spec_options,id",
+            // "options.*.id" => "required|exists:category_spec_options,id",
             "options.*.text" => "required|string",
             "options.*.translations" => "nullable|array",
             "options.*.translations.*.lang_code" => "required|string|exists:languages,code",
@@ -156,22 +157,47 @@ class CategorySpecsController extends Controller
             "translations.*.lang_code" => "required|string|exists:languages,code",
             "translations.*.text" => "required|string",
         ]);
+
+
+
+
         DB::beginTransaction();
         $categorySpecs = CategorySpecs::findOrFail($id);
         $categorySpecs->update($validated);
 
         if ($request->has('options')) {
             foreach ($request->options as $option) {
-                $categorySpecOption = CategorySpecOption::findOrFail($option['id']);
-                $categorySpecOption->update($option);
+                $categorySpecOption = CategorySpecOption::where("category_spec_id", $categorySpecs->id)
+                    ->where("text", $option["text"])->first();
+                if ($categorySpecOption) {
+                    $categorySpecOption->update($option);
+                } else {
+                    $categorySpecOption = CategorySpecOption::create(
+                        [
+                            "category_spec_id" => $categorySpecs->id,
+                            "text" => $option["text"],
+                        ]
+                    );
+                }
                 if (@$option["translations"]) {
                     foreach ($option["translations"] as $translation) {
                         $translation["table_name"] = "category_spec_options";
-                        $categorySpecOption->translations()->update($translation);
+                        $categorySpecOption->translations()->updateOrCreate(
+                            [
+                                "table_name" => "category_spec_options",
+                                "table_id" => $categorySpecOption->id,
+                                "lang_code" => $translation["lang_code"],
+                            ],
+                            $translation
+                        );
                     }
                 }
             }
         }
+
+        // return ["okaaa",$categorySpecs];
+
+
         DB::commit();
         // $categorySpecs = $categorySpecs->with("category");
 
@@ -185,7 +211,7 @@ class CategorySpecsController extends Controller
 
         return response()->json([
             "status" => "ok",
-            "data" => $categorySpecs
+            "data" => $categorySpecs->load("translations")->load("options")->load("options.translations")
         ]);
     }
 }
