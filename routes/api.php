@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CampaignController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CategorySpecGroupNameController;
 use App\Http\Controllers\Admin\CategorySpecsController;
 use App\Http\Controllers\Admin\ColorCatalogController;
 use App\Http\Controllers\Admin\CountryController;
@@ -156,6 +157,15 @@ Route::group(["middleware" => "auth:users"], function () {
 
 Route::prefix('admin')->name('admin.')->middleware(["auth:admins", AdminPermissionMiddleware::class])->group(function () {
 
+
+    $controller = CategorySpecGroupNameController::class;
+    Route::post("/category-spec-group-names", [$controller, 'add'])->name('categorySpecGroupNames.add');
+    Route::get("/category-spec-group-names", [$controller, 'all'])->name('categorySpecGroupNames.all');
+    Route::get("/category-spec-group-names/{id}", [$controller, 'one'])->name('categorySpecGroupNames.one');
+    Route::put("/category-spec-group-names/{id}", [$controller, 'edit'])->name('categorySpecGroupNames.edit');
+    Route::delete("/category-spec-group-names/{id}", [$controller, 'delete'])->name('categorySpecGroupNames.delete');
+    Route::get("/category-spec-group-names/category/{id}", [$controller, 'getByCategory'])->name('categorySpecGroupNames.getByCategory');
+    
 
     Route::get("/campaigns", [CampaignController::class, 'all'])->name('campaigns.all');
     Route::get("/campaigns/{id}", [CampaignController::class, 'one'])->name('campaigns.one');

@@ -8,6 +8,7 @@ class Translation extends Model
 {
     public $fillable = [
         "table_name",
+        "table_id",
         "lang_code",
         "text"
     ];
