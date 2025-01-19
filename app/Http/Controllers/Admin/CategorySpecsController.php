@@ -148,7 +148,7 @@ class CategorySpecsController extends Controller
         $validated = $request->validate([
             "category_id" => "sometimes|exists:categories,id",
             "name" => "sometimes|required", // default olaraq az dilde olmalidir diglerini translationla elave edeceyik
-            "group_name" => "sometimes|string", // 
+            "group_name_id" => "sometimes|exists:category_spec_group_names,id", // 
             "show_in_filter" => "nullable|boolean",
             // "options.*.id" => "required|exists:category_spec_options,id",
             "options.*.text" => "required|string",
