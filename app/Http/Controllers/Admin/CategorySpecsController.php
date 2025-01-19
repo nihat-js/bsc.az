@@ -19,7 +19,7 @@ class CategorySpecsController extends Controller
         $request->validate([
             "category_id" => "required|exists:categories,id",
             "name" => "string|required", // default olaraq az dilde olmalidir diglerini translationla elave edeceyik
-            "group_name" => "nullable|string", // qruplari da yaratmaq olar
+            "group_name_id" => "nullable|exists:category_spec_group_names,id", // qruplari da yaratmaq olar
             "show_in_filter" => "nullable|boolean",
             "options" => "nullable|array",
             "options.*.text" => "required|string",
@@ -64,14 +64,16 @@ class CategorySpecsController extends Controller
 
         return response()->json([
             "status" => "ok",
-            "message" => "Category Specs created"
+            "message" => "Category Specs created",
+            "data" => $categorySpecs->load("translations")->load("options")->load("options.translations")
+            ->load("group_name")->load("group_name.translations")
         ]);
     }
 
     public function all()
     {
 
-        $categorySpecs = CategorySpecs::with("options", "options.translations", "category", "translations")
+        $categorySpecs = CategorySpecs::with("options", "options.translations", "category", "translations","group_name","group_name.translations")
             ->get();
 
         // foreach ($categorySpecs as $categorySpec) {

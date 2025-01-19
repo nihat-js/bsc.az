@@ -86,10 +86,9 @@ class ProductController extends Controller
             'translations.*.description' => 'nullable|string',
 
             "images" => "nullable|array",
-            "images.*.data" => "required|string",
+            "images.*.path" => "required|string",
 
             "campaign_id" => "nullable|integer|exists:campaigns,id",
-            // "images.*." => "string",
         ]);
 
         DB::beginTransaction();

@@ -9,7 +9,7 @@ class CategorySpecs extends Model
 {
     protected $fillable = [
         'category_id',
-        'group_name',
+        'group_name_id',
         'name',
         'show_in_filter',
         'filter_type',
@@ -21,6 +21,11 @@ class CategorySpecs extends Model
         return [
             'show_in_filter' => 'boolean'
         ];
+    }
+
+    public function group_name()
+    {
+        return $this->belongsTo(CategorySpecGroupName::class);
     }
 
     public function category()
