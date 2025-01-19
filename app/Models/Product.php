@@ -46,6 +46,17 @@ class Product extends Model
         return $this->belongsTo(Category::class); // Assuming you have a Category model
     }
 
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+    
+
     public function translations()
     {
         return $this->hasMany(ProductTranslation::class);

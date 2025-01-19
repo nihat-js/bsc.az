@@ -20,34 +20,39 @@ class ProductController extends Controller
     public function one($id)
     {
         $product = Product::with("translations")
+            ->with("category")
+            ->with("colors")
+            // ->with("brand")
+            ->with("country")
             ->with("specs")
+            ->with("specs.translations")
             ->with("images")
             ->findOrFail($id);
 
         // Group the specs by `spec_id` and map each group
-        $arr = collect();
+        $groupedSpecs = collect();
 
         foreach ($product->specs as $spec) {
-            $t = $arr->first(function ($item) use ($spec) {
+            $t = $groupedSpecs->first(function ($item) use ($spec) {
                 return $item["spec_id"] == $spec->spec_id;
             });
 
             if ($t) {
-                $arr = $arr->map(function ($item) use ($spec, $t) {
+                $groupedSpecs = $groupedSpecs->map(function ($item) use ($spec, $t) {
                     if ($item["spec_id"] == $t["spec_id"]) {
                         $item["data"][] = $spec;  // Add the spec to the existing data
                     }
                     return $item;
                 });
             } else {
-                $arr->push([
+                $groupedSpecs->push([
                     "spec_id" => $spec->spec_id,
                     "data" => [$spec]
                 ]);
             }
         }
         $product = $product->toArray();
-        $product["specs"] = $arr;
+        $product["specs"] = $groupedSpecs;
 
 
 
