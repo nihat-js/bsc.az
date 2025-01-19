@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin\CategorySpecOption;
 use App\Models\Campaign;
 use App\Models\Product;
 use App\Models\ProductImage;
@@ -72,7 +73,7 @@ class ProductController extends Controller
             "specs" => "nullable|array",
             "specs.*.spec_id" => "required|integer|exists:category_specs,id",
             "specs.*.data" => "required|array",
-            "specs.*.data.*.text" => "required|string",
+            "specs.*.data.*.text" => "nullable|string",
             "specs.*.data.*.option_id" => "nullable|integer|exists:category_spec_options,id",
             "specs.*.data.*.translations" => "nullable|array",
             "specs.*.data.*.translations.*.lang_code" => "required|string|exists:languages,code",
@@ -119,6 +120,9 @@ class ProductController extends Controller
                 $data = $spec["data"];
                 foreach ($data as $d) {
                     $d["spec_id"] = $spec["spec_id"];
+                    if ($d["option_id"]) {
+                        $d["text"] = CategorySpecOption::find($d["option_id"])->text;
+                    }
                     $s = $product->specs()->create($d);
                     if (@$d["translations"]) {
                         foreach ($d["translations"] as $translation) {
@@ -165,10 +169,10 @@ class ProductController extends Controller
             "status" => "ok",
             'message' => 'Product created successfully',
             'data' => $product->load('translations')
-            ->load("specs")
-            ->load("images")
-            ->load("colors")
-            ->load("category")
+                ->load("specs")
+                ->load("images")
+                ->load("colors")
+                ->load("category")
         ], 201);
     }
 
@@ -216,7 +220,7 @@ class ProductController extends Controller
         }
 
         return response()->json([
-            "message" => "OK", 
+            "message" => "OK",
             "count" => $allCount,
             "data" => $products,
         ]);
@@ -343,10 +347,10 @@ class ProductController extends Controller
         return response()->json([
             'message' => 'Product updated successfully',
             'data' => $product->load('translations')
-            ->load("specs")
-            ->load("images")
-            ->load("colors")
-            ->load("category")
+                ->load("specs")
+                ->load("images")
+                ->load("colors")
+                ->load("category")
         ], 200);
     }
 
